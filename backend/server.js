@@ -13,6 +13,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Importar rutas
 const authRoutes = require('./src/routes/authRoutes');
+const productoRoutes = require('./src/routes/productoRoutes');
 
 // Ruta de prueba principal
 app.get('/', (req, res) => {
@@ -22,6 +23,7 @@ app.get('/', (req, res) => {
     status: 'running',
     endpoints: {
       auth: '/api/auth',
+      productos: '/api/productos',
       testDB: '/api/test-db'
     }
   });
@@ -53,6 +55,9 @@ app.get('/api/test-db', async (req, res) => {
 
 // Rutas de autenticación
 app.use('/api/auth', authRoutes);
+
+// Rutas de productos
+app.use('/api/productos', productoRoutes);
 
 // Manejo de rutas no encontradas (404)
 app.use((req, res) => {
@@ -86,6 +91,8 @@ app.listen(PORT, () => {
   console.log('   GET  /api/test-db');
   console.log('   POST /api/auth/register');
   console.log('   POST /api/auth/login');
+  console.log('   GET  /api/productos');
+  console.log('   POST /api/productos');
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 });
 

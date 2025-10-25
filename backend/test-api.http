@@ -1,0 +1,52 @@
+### Probar servidor
+GET http://localhost:3000/
+
+### Probar conexión BD
+GET http://localhost:3000/api/test-db
+
+### Registrar usuario
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+  "nombre": "Test User",
+  "email": "test@panaderia.com",
+  "password": "Test1234"
+}
+
+### Login Admin
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@panaderia.com",
+  "password": "Admin123"
+}
+### ========================================
+### PRODUCTOS
+### ========================================
+
+### 1. Obtener todos los productos (requiere token)
+GET http://localhost:3000/api/productos
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjoxLCJlbWFpbCI6ImFkbWluQHBhbmFkZXJpYS5jb20iLCJub21icmUiOiJFZHdpbiIsInBlcm1pc29zIjpbIkFzaWduYWNpb24gUm9sZXMgeSBQZXJtaXNvcyIsIlBlcm1pc28iLCJSb2wiLCJSb2wgUGVybWlzbyIsIlVzdWFyaW8iXSwiaWF0IjoxNzYxMzU1NDM5LCJleHAiOjE3NjE0NDE4Mzl9.0hc64lHShGFssS05z0zqHWOscL6kJTSf3W9SykmXTIc
+
+### 2. Crear producto (requiere token y permiso)
+POST http://localhost:3000/api/productos
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjoxLCJlbWFpbCI6ImFkbWluQHBhbmFkZXJpYS5jb20iLCJub21icmUiOiJFZHdpbiIsInBlcm1pc29zIjpbIkFzaWduYWNpb24gUm9sZXMgeSBQZXJtaXNvcyIsIlBlcm1pc28iLCJSb2wiLCJSb2wgUGVybWlzbyIsIlVzdWFyaW8iXSwiaWF0IjoxNzYxMzU1NDM5LCJleHAiOjE3NjE0NDE4Mzl9.0hc64lHShGFssS05z0zqHWOscL6kJTSf3W9SykmXTIc
+Content-Type: application/json
+
+{
+  "nombre": "Pan Francés",
+  "descripcion": "Pan artesanal tradicional",
+  "codigo_barras": "7501234567890",
+  "precio_venta": 2.50,
+  "precio_compra": 1.20,
+  "stock_minimo": 20,
+  "stock_actual": 50,
+  "id_categoria": 1,
+  "id_unidad": 1
+}
+
+### 3. Obtener productos con stock bajo
+GET http://localhost:3000/api/productos/low-stock
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjoxLCJlbWFpbCI6ImFkbWluQHBhbmFkZXJpYS5jb20iLCJub21icmUiOiJFZHdpbiIsInBlcm1pc29zIjpbIkFzaWduYWNpb24gUm9sZXMgeSBQZXJtaXNvcyIsIlBlcm1pc28iLCJSb2wiLCJSb2wgUGVybWlzbyIsIlVzdWFyaW8iXSwiaWF0IjoxNzYxMzU1NDM5LCJleHAiOjE3NjE0NDE4Mzl9.0hc64lHShGFssS05z0zqHWOscL6kJTSf3W9SykmXTIc

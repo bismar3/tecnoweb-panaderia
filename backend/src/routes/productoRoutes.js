@@ -13,7 +13,6 @@ const { verifyToken, checkPermission } = require('../middlewares/authMiddleware'
 
 // Rutas públicas (solo lectura)
 router.get('/', verifyToken, getAllProductos);
-router.get('/low-stock', verifyToken, getLowStockProducts);
 router.get('/:id', verifyToken, getProductoById);
 
 // Rutas protegidas (requieren permisos)

@@ -30,23 +30,24 @@ Content-Type: application/json
 GET http://localhost:3000/api/productos
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjoxLCJlbWFpbCI6ImFkbWluQHBhbmFkZXJpYS5jb20iLCJub21icmUiOiJFZHdpbiIsInBlcm1pc29zIjpbIkFzaWduYWNpb24gUm9sZXMgeSBQZXJtaXNvcyIsIlBlcm1pc28iLCJSb2wiLCJSb2wgUGVybWlzbyIsIlVzdWFyaW8iXSwiaWF0IjoxNzYxMzU1NDM5LCJleHAiOjE3NjE0NDE4Mzl9.0hc64lHShGFssS05z0zqHWOscL6kJTSf3W9SykmXTIc
 
-### 2. Crear producto (requiere token y permiso)
+### 2. Crear producto nuevo
 POST http://localhost:3000/api/productos
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjoxLCJlbWFpbCI6ImFkbWluQHBhbmFkZXJpYS5jb20iLCJub21icmUiOiJFZHdpbiIsInBlcm1pc29zIjpbIkFzaWduYWNpb24gUm9sZXMgeSBQZXJtaXNvcyIsIlBlcm1pc28iLCJSb2wiLCJSb2wgUGVybWlzbyIsIlVzdWFyaW8iXSwiaWF0IjoxNzYxMzU1NDM5LCJleHAiOjE3NjE0NDE4Mzl9.0hc64lHShGFssS05z0zqHWOscL6kJTSf3W9SykmXTIc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjoxLCJlbWFpbCI6ImFkbWluQHBhbmFkZXJpYS5jb20iLCJub21icmUiOiJFZHdpbiIsInBlcm1pc29zIjpbIkFzaWduYWNpb24gUm9sZXMgeSBQZXJtaXNvcyIsIlBlcm1pc28iLCJQcm9kdWN0byIsIlJvbCIsIlJvbCBQZXJtaXNvIiwiVXN1YXJpbyJdLCJpYXQiOjE3NjE0MDAyNzksImV4cCI6MTc2MTQ4NjY3OX0.NQmiMucSDDePdCVuQ-tqscCyPJ6hy0F5KcgOLgrVKME
 Content-Type: application/json
 
 {
-  "nombre": "Pan Francés",
-  "descripcion": "Pan artesanal tradicional",
-  "codigo_barras": "7501234567890",
-  "precio_venta": 2.50,
-  "precio_compra": 1.20,
-  "stock_minimo": 20,
-  "stock_actual": 50,
+  "codigo": "PAN003",
+  "nombre": "Pan de Maíz",
+  "descripcion": "Pan dulce de maíz tradicional",
   "id_categoria": 1,
-  "id_unidad": 1
+  "unidad_medida": "unidad",
+  "precio_venta": 2.50
 }
 
 ### 3. Obtener productos con stock bajo
 GET http://localhost:3000/api/productos/low-stock
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjoxLCJlbWFpbCI6ImFkbWluQHBhbmFkZXJpYS5jb20iLCJub21icmUiOiJFZHdpbiIsInBlcm1pc29zIjpbIkFzaWduYWNpb24gUm9sZXMgeSBQZXJtaXNvcyIsIlBlcm1pc28iLCJSb2wiLCJSb2wgUGVybWlzbyIsIlVzdWFyaW8iXSwiaWF0IjoxNzYxMzU1NDM5LCJleHAiOjE3NjE0NDE4Mzl9.0hc64lHShGFssS05z0zqHWOscL6kJTSf3W9SykmXTIc
+
+### Ver todos los productos
+GET http://localhost:3000/api/productos
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjoxLCJlbWFpbCI6ImFkbWluQHBhbmFkZXJpYS5jb20iLCJub21icmUiOiJFZHdpbiIsInBlcm1pc29zIjpbIkFzaWduYWNpb24gUm9sZXMgeSBQZXJtaXNvcyIsIlBlcm1pc28iLCJQcm9kdWN0byIsIlJvbCIsIlJvbCBQZXJtaXNvIiwiVXN1YXJpbyJdLCJpYXQiOjE3NjE0MDAyNzksImV4cCI6MTc2MTQ4NjY3OX0.NQmiMucSDDePdCVuQ-tqscCyPJ6hy0F5KcgOLgrVKME

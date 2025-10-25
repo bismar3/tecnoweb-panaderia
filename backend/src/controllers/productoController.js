@@ -57,24 +57,13 @@ const getProductoById = async (req, res) => {
 // Crear producto
 const createProducto = async (req, res) => {
   try {
-    const {
-      nombre,
-      descripcion,
-      codigo_barras,
-      precio_venta,
-      precio_compra,
-      stock_minimo,
-      stock_actual,
-      id_categoria,
-      id_unidad,
-      imagen_url
-    } = req.body;
+    const { codigo, nombre, descripcion, id_categoria, unidad_medida, precio_venta } = req.body;
 
     // Validaciones básicas
-    if (!nombre || !precio_venta || !id_categoria || !id_unidad) {
+    if (!codigo || !nombre || !unidad_medida || !precio_venta) {
       return res.status(400).json({
         success: false,
-        message: 'Faltan campos requeridos: nombre, precio_venta, id_categoria, id_unidad'
+        message: 'Faltan campos requeridos: codigo, nombre, unidad_medida, precio_venta'
       });
     }
 
@@ -85,17 +74,22 @@ const createProducto = async (req, res) => {
       });
     }
 
+    // Verificar si el código ya existe
+    const codigoExiste = await ProductoModel.getByCodigo(codigo);
+    if (codigoExiste) {
+      return res.status(400).json({
+        success: false,
+        message: 'El código ya está registrado'
+      });
+    }
+
     const productoData = {
+      codigo,
       nombre,
       descripcion,
-      codigo_barras,
-      precio_venta: parseFloat(precio_venta),
-      precio_compra: precio_compra ? parseFloat(precio_compra) : null,
-      stock_minimo: stock_minimo || 0,
-      stock_actual: stock_actual || 0,
-      id_categoria: parseInt(id_categoria),
-      id_unidad: parseInt(id_unidad),
-      imagen_url
+      id_categoria,
+      unidad_medida,
+      precio_venta: parseFloat(precio_venta)
     };
 
     const nuevoProducto = await ProductoModel.create(productoData);
@@ -130,12 +124,23 @@ const updateProducto = async (req, res) => {
       });
     }
 
-    // Validar precios si vienen en la actualización
+    // Validar precio si viene en la actualización
     if (productoData.precio_venta && productoData.precio_venta <= 0) {
       return res.status(400).json({
         success: false,
         message: 'El precio de venta debe ser mayor a 0'
       });
+    }
+
+    // Verificar código duplicado si se está actualizando
+    if (productoData.codigo && productoData.codigo !== productoExistente.codigo) {
+      const codigoExiste = await ProductoModel.getByCodigo(productoData.codigo);
+      if (codigoExiste) {
+        return res.status(400).json({
+          success: false,
+          message: 'El código ya está registrado'
+        });
+      }
     }
 
     const productoActualizado = await ProductoModel.update(id, productoData);
@@ -237,7 +242,7 @@ const updateStock = async (req, res) => {
   }
 };
 
-// Obtener productos con stock bajo
+/* Obtener productos con stock bajo
 const getLowStockProducts = async (req, res) => {
   try {
     const productos = await ProductoModel.checkLowStock();
@@ -255,8 +260,7 @@ const getLowStockProducts = async (req, res) => {
       error: error.message
     });
   }
-};
-
+};*/
 module.exports = {
   getAllProductos,
   getProductoById,
@@ -264,5 +268,5 @@ module.exports = {
   updateProducto,
   deleteProducto,
   updateStock,
-  getLowStockProducts
+
 };

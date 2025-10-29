@@ -53,11 +53,76 @@ app.get('/api/test-db', async (req, res) => {
   }
 });
 
+// Ruta temporal para ver estructura de tablas
+app.get('/api/debug/table/:tableName', async (req, res) => {
+  try {
+    const { tableName } = req.params;
+    const pool = require('./src/config/database');
+    
+    const result = await pool.query(`
+      SELECT column_name, data_type, character_maximum_length, is_nullable, column_default
+      FROM information_schema.columns
+      WHERE table_name = $1
+      ORDER BY ordinal_position
+    `, [tableName]);
+    
+    res.json({
+      success: true,
+      table: tableName,
+      columns: result.rows
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 // Rutas de autenticación
 app.use('/api/auth', authRoutes);
-
 // Rutas de productos
 app.use('/api/productos', productoRoutes);
+// Rutas de clientes 
+const clienteRoutes = require('./src/routes/clienteRoutes');
+app.use('/api/clientes', clienteRoutes);
+// Rutas de almacenes
+const almacenRoutes = require('./src/routes/almacenRoutes');
+app.use('/api/almacenes', almacenRoutes);
+// Rutas de inventarios
+const inventarioRoutes = require('./src/routes/inventarioRoutes');
+app.use('/api/inventarios', inventarioRoutes);
+// Rutas de pedidos 
+const pedidoRoutes = require('./src/routes/pedidoRoutes');
+app.use('/api/pedidos', pedidoRoutes);
+// Rutas de deliveries (repartidores)
+const deliveryRoutes = require('./src/routes/deliveryRoutes');
+app.use('/api/deliveries', deliveryRoutes);
+// Rutas de entregas
+const entregaRoutes = require('./src/routes/entregaRoutes');
+app.use('/api/entregas', entregaRoutes);
+// Rutas de métodos de pago
+const metodoPagoRoutes = require('./src/routes/metodoPagoRoutes');
+app.use('/api/metodos-pago', metodoPagoRoutes);
+// Rutas de pagos
+const pagoRoutes = require('./src/routes/pagoRoutes');
+app.use('/api/pagos', pagoRoutes);
+// Rutas de compras
+const compraRoutes = require('./src/routes/compraRoutes');
+app.use('/api/compras', compraRoutes);
+// Rutas de recetas 
+const recetaRoutes = require('./src/routes/recetaRoutes');
+app.use('/api/recetas', recetaRoutes)
+// Rutas de producción
+const produccionRoutes = require('./src/routes/produccionRoutes');
+app.use('/api/producciones', produccionRoutes);
+
+// Rutas de proveedores
+const proveedorRoutes = require('./src/routes/proveedorRoutes');
+app.use('/api/proveedores', proveedorRoutes);
+// Rutas de promociones
+const promocionRoutes = require('./src/routes/promocionRoutes');
+app.use('/api/promociones', promocionRoutes);
 
 // Manejo de rutas no encontradas (404)
 app.use((req, res) => {
@@ -92,7 +157,12 @@ app.listen(PORT, () => {
   console.log('   POST /api/auth/register');
   console.log('   POST /api/auth/login');
   console.log('   GET  /api/productos');
-  console.log('   POST /api/productos');
+  console.log('   GET  /api/clientes');
+  console.log('   GET  /api/almacenes');
+  console.log('   GET  /api/inventarios');
+  console.log('   GET  /api/pedidos');
+  console.log('   GET  /api/deliveries');
+  console.log('   GET  /api/entregas');
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 });
 

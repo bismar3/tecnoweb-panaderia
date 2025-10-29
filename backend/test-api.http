@@ -50,4 +50,155 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjoxL
 
 ### Ver todos los productos
 GET http://localhost:3000/api/productos
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjoxLCJlbWFpbCI6ImFkbWluQHBhbmFkZXJpYS5jb20iLCJub21icmUiOiJFZHdpbiIsInBlcm1pc29zIjpbIkFzaWduYWNpb24gUm9sZXMgeSBQZXJtaXNvcyIsIlBlcm1pc28iLCJQcm9kdWN0byIsIlJvbCIsIlJvbCBQZXJtaXNvIiwiVXN1YXJpbyJdLCJpYXQiOjE3NjE0MDAyNzksImV4cCI6MTc2MTQ4NjY3OX0.NQmiMucSDDePdCVuQ-tqscCyPJ6hy0F5KcgOLgrVKME
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjoxLCJlbWFpbCI6ImFkbWluQHBhbmFkZXJpYS5jb20iLCJub21icmUiOiJFZHdpbiIsInBlcm1pc29zIjpbIkFsbWFjZW4iLCJBc2lnbmFjaW9uIFJvbGVzIHkgUGVybWlzb3MiLCJDbGllbnRlIiwiSW52ZW50YXJpbyIsIlBlcm1pc28iLCJSb2wiLCJSb2wgUGVybWlzbyIsIlVzdWFyaW8iXSwiaWF0IjoxNzYxNjE2NjI5LCJleHAiOjE3NjIyMjE0Mjl9.YYqzAdyAEOORinBKNDvEUoeIz05fB8LaD9HPQiT5944
+### Ver estructura de categorías (temporal - para verificar)
+GET http://localhost:3000/api/test-query
+### Ver estructura tabla clientes
+GET http://localhost:3000/api/debug/table/clientes
+
+### 1. Listar todos los clientes
+GET http://localhost:3000/api/clientes
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjoxLCJlbWFpbCI6ImFkbWluQHBhbmFkZXJpYS5jb20iLCJub21icmUiOiJFZHdpbiIsInBlcm1pc29zIjpbIkFzaWduYWNpb24gUm9sZXMgeSBQZXJtaXNvcyIsIkNsaWVudGUiLCJQZXJtaXNvIiwiUm9sIiwiUm9sIFBlcm1pc28iLCJVc3VhcmlvIl0sImlhdCI6MTc2MTU1Mjk1NywiZXhwIjoxNzYyMTU3NzU3fQ.eBI4GkFP4bvf-LjcmdczfPUP0kGkiOBCxPKF0zN_azs
+### 2. Crear cliente
+POST http://localhost:3000/api/clientes
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjoxLCJlbWFpbCI6ImFkbWluQHBhbmFkZXJpYS5jb20iLCJub21icmUiOiJFZHdpbiIsInBlcm1pc29zIjpbIkFzaWduYWNpb24gUm9sZXMgeSBQZXJtaXNvcyIsIkNsaWVudGUiLCJQZXJtaXNvIiwiUm9sIiwiUm9sIFBlcm1pc28iLCJVc3VhcmlvIl0sImlhdCI6MTc2MTU1Mjk1NywiZXhwIjoxNzYyMTU3NzU3fQ.eBI4GkFP4bvf-LjcmdczfPUP0kGkiOBCxPKF0zN_azs
+Content-Type: application/json
+
+{
+  "nombre": "Juan Pérez",
+  "email": "juan.perez@email.com",
+  "telefono": "71234567",
+  "direccion": "Av. 16 de Julio #1234, La Paz",
+  "nit": "1234567891",
+  "tipo": "regular"
+}
+### Ver estructura tabla almacenes
+GET http://localhost:3000/api/debug/table/almacenes
+### Ver estructura tabla productos_almacenes
+GET http://localhost:3000/api/debug/table/productos_almacenes
+
+### Ver estructura tabla movimientos_inventario
+GET http://localhost:3000/api/debug/table/movimientos_inventario
+### 1. Listar almacenes
+GET http://localhost:3000/api/almacenes
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjoxLCJlbWFpbCI6ImFkbWluQHBhbmFkZXJpYS5jb20iLCJub21icmUiOiJFZHdpbiIsInBlcm1pc29zIjpbIkFsbWFjZW4iLCJBc2lnbmFjaW9uIFJvbGVzIHkgUGVybWlzb3MiLCJDbGllbnRlIiwiUGVybWlzbyIsIlJvbCIsIlJvbCBQZXJtaXNvIiwiVXN1YXJpbyJdLCJpYXQiOjE3NjE2MTMzMjgsImV4cCI6MTc2MjIxODEyOH0.65MN2jG1pwvD4wvFH_dicLXs4gslMH40yafgYSz1_o8
+
+### 2. Crear almacén
+POST http://localhost:3000/api/almacenes
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjoxLCJlbWFpbCI6ImFkbWluQHBhbmFkZXJpYS5jb20iLCJub21icmUiOiJFZHdpbiIsInBlcm1pc29zIjpbIkFsbWFjZW4iLCJBc2lnbmFjaW9uIFJvbGVzIHkgUGVybWlzb3MiLCJDbGllbnRlIiwiUGVybWlzbyIsIlJvbCIsIlJvbCBQZXJtaXNvIiwiVXN1YXJpbyJdLCJpYXQiOjE3NjE2MTMzMjgsImV4cCI6MTc2MjIxODEyOH0.65MN2jG1pwvD4wvFH_dicLXs4gslMH40yafgYSz1_o8
+Content-Type: application/json
+
+{
+  "nombre": "Almacén secundario",
+  "ubicacion": "Planta Baja - Zona A",
+  "capacidad_maxima": 1000
+}
+### 1. Listar inventarios
+GET http://localhost:3000/api/inventarios
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjoxLCJlbWFpbCI6ImFkbWluQHBhbmFkZXJpYS5jb20iLCJub21icmUiOiJFZHdpbiIsInBlcm1pc29zIjpbIkFsbWFjZW4iLCJBc2lnbmFjaW9uIFJvbGVzIHkgUGVybWlzb3MiLCJDbGllbnRlIiwiSW52ZW50YXJpbyIsIlBlcm1pc28iLCJSb2wiLCJSb2wgUGVybWlzbyIsIlVzdWFyaW8iXSwiaWF0IjoxNzYxNjE0Njg2LCJleHAiOjE3NjIyMTk0ODZ9.Xy2HNyiPzRFoC8ghAchXUTRiwMyzq61cJ5Lgy6dxf34
+
+### 2. Crear inventario (asignar producto a almacén)
+POST http://localhost:3000/api/inventarios
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjoxLCJlbWFpbCI6ImFkbWluQHBhbmFkZXJpYS5jb20iLCJub21icmUiOiJFZHdpbiIsInBlcm1pc29zIjpbIkFsbWFjZW4iLCJBc2lnbmFjaW9uIFJvbGVzIHkgUGVybWlzb3MiLCJDbGllbnRlIiwiSW52ZW50YXJpbyIsIlBlcm1pc28iLCJSb2wiLCJSb2wgUGVybWlzbyIsIlVzdWFyaW8iXSwiaWF0IjoxNzYxNjE0Njg2LCJleHAiOjE3NjIyMTk0ODZ9.Xy2HNyiPzRFoC8ghAchXUTRiwMyzq61cJ5Lgy6dxf34
+Content-Type: application/json
+
+{
+  "id_producto": 1,
+  "id_almacen": 1,
+  "cantidad": 100,
+  "stock_minimo": 20,
+  "stock_maximo": 500
+}
+
+### 3. Ajustar stock (agregar 50 unidades)
+POST http://localhost:3000/api/inventarios/ajustar
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjoxLCJlbWFpbCI6ImFkbWluQHBhbmFkZXJpYS5jb20iLCJub21icmUiOiJFZHdpbiIsInBlcm1pc29zIjpbIkFsbWFjZW4iLCJBc2lnbmFjaW9uIFJvbGVzIHkgUGVybWlzb3MiLCJDbGllbnRlIiwiSW52ZW50YXJpbyIsIlBlcm1pc28iLCJSb2wiLCJSb2wgUGVybWlzbyIsIlVzdWFyaW8iXSwiaWF0IjoxNzYxNjE0Njg2LCJleHAiOjE3NjIyMTk0ODZ9.Xy2HNyiPzRFoC8ghAchXUTRiwMyzq61cJ5Lgy6dxf34
+Content-Type: application/json
+
+{
+  "id_producto": 1,
+  "id_almacen": 1,
+  "cantidad": 50,
+  "operacion": "suma"
+}
+
+### 4. Ver productos con stock bajo
+GET http://localhost:3000/api/inventarios/stock-bajo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjoxLCJlbWFpbCI6ImFkbWluQHBhbmFkZXJpYS5jb20iLCJub21icmUiOiJFZHdpbiIsInBlcm1pc29zIjpbIkFsbWFjZW4iLCJBc2lnbmFjaW9uIFJvbGVzIHkgUGVybWlzb3MiLCJDbGllbnRlIiwiSW52ZW50YXJpbyIsIlBlcm1pc28iLCJSb2wiLCJSb2wgUGVybWlzbyIsIlVzdWFyaW8iXSwiaWF0IjoxNzYxNjE0Njg2LCJleHAiOjE3NjIyMTk0ODZ9.Xy2HNyiPzRFoC8ghAchXUTRiwMyzq61cJ5Lgy6dxf34
+
+### movimiento inventario 
+GET http://localhost:3000/api/debug/table/movimientos_inventario
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjoxLCJlbWFpbCI6ImFkbWluQHBhbmFkZXJpYS5jb20iLCJub21icmUiOiJFZHdpbiIsInBlcm1pc29zIjpbIkFsbWFjZW4iLCJBc2lnbmFjaW9uIFJvbGVzIHkgUGVybWlzb3MiLCJDbGllbnRlIiwiSW52ZW50YXJpbyIsIlBlcm1pc28iLCJSb2wiLCJSb2wgUGVybWlzbyIsIlVzdWFyaW8iXSwiaWF0IjoxNzYxNjE0Njg2LCJleHAiOjE3NjIyMTk0ODZ9.Xy2HNyiPzRFoC8ghAchXUTRiwMyzq61cJ5Lgy6dxf34
+### Crear pedido (descuenta inventario automáticamente)
+POST http://localhost:3000/api/pedidos
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjoxLCJlbWFpbCI6ImFkbWluQHBhbmFkZXJpYS5jb20iLCJub21icmUiOiJFZHdpbiIsInBlcm1pc29zIjpbIkFsbWFjZW4iLCJBc2lnbmFjaW9uIFJvbGVzIHkgUGVybWlzb3MiLCJDbGllbnRlIiwiSW52ZW50YXJpbyIsIlBlZGlkbyIsIlBlcm1pc28iLCJSb2wiLCJSb2wgUGVybWlzbyIsIlVzdWFyaW8iLCJWZW50YSJdLCJpYXQiOjE3NjE2NTY4MDQsImV4cCI6MTc2MjI2MTYwNH0.RxKps-yUNES7Qex8A8mw5mUbzDjzy0-YuZKBy7pIMNE
+Content-Type: application/json
+
+{
+  "id_cliente": 1,
+  "id_almacen": 1,
+  "fecha_entrega_estimada": "2025-10-30",
+  "observaciones": "Entregar por la mañana temprano",
+  "descuento": 5.00,
+  "detalles": [
+    {
+      "id_producto": 1,
+      "cantidad": 10,
+      "precio_unitario": 2.50
+    },
+    {
+      "id_producto": 2,
+      "cantidad": 5,
+      "precio_unitario": 3.00
+    },
+    {
+      "id_producto": 3,
+      "cantidad": 8,
+      "precio_unitario": 1.50
+    }
+  ]
+}
+### Ver estructura tabla pedidos
+GET http://localhost:3000/api/debug/table/pedidos
+### 1. Listar deliveries (repartidores)
+GET http://localhost:3000/api/deliveries
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjoxLCJlbWFpbCI6ImFkbWluQHBhbmFkZXJpYS5jb20iLCJub21icmUiOiJFZHdpbiIsInBlcm1pc29zIjpbIkFsbWFjZW4iLCJBc2lnbmFjaW9uIFJvbGVzIHkgUGVybWlzb3MiLCJDbGllbnRlIiwiRGVsaXZlcnkiLCJJbnZlbnRhcmlvIiwiUGVkaWRvIiwiUGVybWlzbyIsIlJvbCIsIlJvbCBQZXJtaXNvIiwiVXN1YXJpbyIsIlZlbnRhIl0sImlhdCI6MTc2MTY3NTg2MiwiZXhwIjoxNzYyMjgwNjYyfQ.oszWQEwc6bU-p8V7-pz-tWvK3pTR9uiXcuivUVrKwmY
+
+### 2. Crear delivery (repartidor)
+### Crear delivery
+POST http://localhost:3000/api/deliveries
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjoxLCJlbWFpbCI6ImFkbWluQHBhbmFkZXJpYS5jb20iLCJub21icmUiOiJFZHdpbiIsInBlcm1pc29zIjpbIkFsbWFjZW4iLCJBc2lnbmFjaW9uIFJvbGVzIHkgUGVybWlzb3MiLCJDbGllbnRlIiwiRGVsaXZlcnkiLCJJbnZlbnRhcmlvIiwiUGVkaWRvIiwiUGVybWlzbyIsIlJvbCIsIlJvbCBQZXJtaXNvIiwiVXN1YXJpbyIsIlZlbnRhIl0sImlhdCI6MTc2MTY3NjEwMywiZXhwIjoxNzYyMjgwOTAzfQ.QGIds8Kkh-fnzFFIPmFytkkwjdKpooQYW_IMs2Hzmvc
+Content-Type: application/json
+
+{
+  "nombre": "Carlos Mamani",
+  "telefono": "75123456",
+  "vehiculo": "Moto",
+  "placa": "1234-ABC"
+}
+### 3. Listar entregas
+GET http://localhost:3000/api/entregas
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjoxLCJlbWFpbCI6ImFkbWluQHBhbmFkZXJpYS5jb20iLCJub21icmUiOiJFZHdpbiIsInBlcm1pc29zIjpbIkFsbWFjZW4iLCJBc2lnbmFjaW9uIFJvbGVzIHkgUGVybWlzb3MiLCJDbGllbnRlIiwiRGVsaXZlcnkiLCJJbnZlbnRhcmlvIiwiUGVkaWRvIiwiUGVybWlzbyIsIlJvbCIsIlJvbCBQZXJtaXNvIiwiVXN1YXJpbyIsIlZlbnRhIl0sImlhdCI6MTc2MTY3NTg2MiwiZXhwIjoxNzYyMjgwNjYyfQ.oszWQEwc6bU-p8V7-pz-tWvK3pTR9uiXcuivUVrKwmY
+
+
+### 4. Crear entrega
+POST http://localhost:3000/api/entregas
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjoxLCJlbWFpbCI6ImFkbWluQHBhbmFkZXJpYS5jb20iLCJub21icmUiOiJFZHdpbiIsInBlcm1pc29zIjpbIkFsbWFjZW4iLCJBc2lnbmFjaW9uIFJvbGVzIHkgUGVybWlzb3MiLCJDbGllbnRlIiwiRGVsaXZlcnkiLCJJbnZlbnRhcmlvIiwiUGVkaWRvIiwiUGVybWlzbyIsIlJvbCIsIlJvbCBQZXJtaXNvIiwiVXN1YXJpbyIsIlZlbnRhIl0sImlhdCI6MTc2MTY3NTg2MiwiZXhwIjoxNzYyMjgwNjYyfQ.oszWQEwc6bU-p8V7-pz-tWvK3pTR9uiXcuivUVrKwmY
+Content-Type: application/json
+
+{
+  "id_pedido": 1,
+  "id_delivery": 1,
+  "direccion_entrega": "Av. 16 de Julio #1234, La Paz",
+  "observaciones": "Timbre color rojo"
+}
+### Ver estructura tabla promociones
+GET http://localhost:3000/api/debug/table/promociones
+
+### Ver estructura tabla promociones_productos
+GET http://localhost:3000/api/debug/table/promociones_productos
+### Ver estructura tabla metodos_pago faltan probar todo desde aqui 
+GET http://localhost:3000/api/debug/table/metodos_pago
+
+### Ver estructura tabla pagos
+GET http://localhost:3000/api/debug/table/pagos

@@ -1,0 +1,156 @@
+/* ============================================
+   TEMA PREDETERMINADO - MODERNO Y PROFESIONAL
+   Colores: Gradiente Azul-Púrpura
+   ============================================ */
+
+:root {
+    /* Colores primarios */
+    --primary-color: #6366f1;
+    --primary-hover: #4f46e5;
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    
+    /* Fondos */
+    --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --card-bg: rgba(255, 255, 255, 0.95);
+    --input-bg: #ffffff;
+    --hover-bg: rgba(99, 102, 241, 0.1);
+    
+    /* Textos */
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    
+    /* Bordes */
+    --border-color: rgba(99, 102, 241, 0.2);
+    --input-border: #e5e7eb;
+    
+    /* Sombras */
+    --shadow: 0 20px 50px rgba(99, 102, 241, 0.3);
+    --focus-shadow: rgba(99, 102, 241, 0.25);
+    --btn-shadow: rgba(99, 102, 241, 0.4);
+    
+    /* Alertas - Success */
+    --success-bg: #d1fae5;
+    --success-color: #065f46;
+    --success-border: #6ee7b7;
+    
+    /* Alertas - Error */
+    --error-bg: #fee2e2;
+    --error-color: #991b1b;
+    --error-border: #fca5a5;
+    
+    /* Dashboard */
+    --sidebar-bg: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+    --sidebar-text: #ffffff;
+    --sidebar-hover: rgba(255, 255, 255, 0.15);
+    --sidebar-active: rgba(255, 255, 255, 0.25);
+    
+    /* Cards del Dashboard */
+    --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --card-hover-shadow: 0 10px 15px rgba(0, 0, 0, 0.15);
+    
+    /* Tablas */
+    --table-header-bg: #f3f4f6;
+    --table-row-hover: rgba(99, 102, 241, 0.05);
+    --table-border: #e5e7eb;
+    
+    /* Botones secundarios */
+    --btn-secondary: #6b7280;
+    --btn-secondary-hover: #4b5563;
+    
+    /* Badges */
+    --badge-success: #10b981;
+    --badge-warning: #f59e0b;
+    --badge-danger: #ef4444;
+    --badge-info: #3b82f6;
+}
+
+/* ============================================
+   ESTILOS GLOBALES DEL TEMA
+   ============================================ */
+
+body[data-theme="default"] {
+    background: var(--bg-gradient);
+    color: var(--text-primary);
+}
+
+/* Sidebar */
+body[data-theme="default"] .sidebar {
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text);
+}
+
+body[data-theme="default"] .sidebar-link {
+    color: var(--sidebar-text);
+}
+
+body[data-theme="default"] .sidebar-link:hover {
+    background: var(--sidebar-hover);
+}
+
+body[data-theme="default"] .sidebar-link.active {
+    background: var(--sidebar-active);
+}
+
+/* Cards */
+body[data-theme="default"] .card {
+    background: var(--card-bg);
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--border-color);
+}
+
+body[data-theme="default"] .card:hover {
+    box-shadow: var(--card-hover-shadow);
+}
+
+/* Botones primarios */
+body[data-theme="default"] .btn-primary {
+    background: var(--primary-gradient);
+    box-shadow: 0 4px 15px var(--btn-shadow);
+}
+
+body[data-theme="default"] .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px var(--btn-shadow);
+}
+
+/* Tablas */
+body[data-theme="default"] .table thead {
+    background: var(--table-header-bg);
+}
+
+body[data-theme="default"] .table tbody tr:hover {
+    background: var(--table-row-hover);
+}
+
+/* Inputs */
+body[data-theme="default"] input,
+body[data-theme="default"] select,
+body[data-theme="default"] textarea {
+    background: var(--input-bg);
+    border: 2px solid var(--input-border);
+    color: var(--text-primary);
+}
+
+body[data-theme="default"] input:focus,
+body[data-theme="default"] select:focus,
+body[data-theme="default"] textarea:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--focus-shadow);
+}
+
+/* Badges */
+body[data-theme="default"] .badge-success {
+    background: var(--badge-success);
+}
+
+body[data-theme="default"] .badge-warning {
+    background: var(--badge-warning);
+}
+
+body[data-theme="default"] .badge-danger {
+    background: var(--badge-danger);
+}
+
+body[data-theme="default"] .badge-info {
+    background: var(--badge-info);
+}

@@ -1,0 +1,238 @@
+/* ============================================
+   TEMA CLARO - MINIMALISTA Y PROFESIONAL
+   Colores: Blancos y grises con acentos verdes
+   ============================================ */
+
+:root {
+    /* Colores primarios */
+    --primary-color: #059669;
+    --primary-hover: #047857;
+    --primary-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    
+    /* Fondos */
+    --bg-gradient: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+    --card-bg: #ffffff;
+    --input-bg: #ffffff;
+    --hover-bg: rgba(5, 150, 105, 0.05);
+    
+    /* Textos */
+    --text-primary: #111827;
+    --text-secondary: #6b7280;
+    
+    /* Bordes */
+    --border-color: #e5e7eb;
+    --input-border: #d1d5db;
+    
+    /* Sombras */
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --focus-shadow: rgba(5, 150, 105, 0.15);
+    --btn-shadow: rgba(5, 150, 105, 0.25);
+    
+    /* Alertas - Success */
+    --success-bg: #d1fae5;
+    --success-color: #065f46;
+    --success-border: #6ee7b7;
+    
+    /* Alertas - Error */
+    --error-bg: #fee2e2;
+    --error-color: #991b1b;
+    --error-border: #fca5a5;
+    
+    /* Dashboard */
+    --sidebar-bg: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%);
+    --sidebar-text: #374151;
+    --sidebar-hover: rgba(5, 150, 105, 0.08);
+    --sidebar-active: rgba(5, 150, 105, 0.12);
+    
+    /* Cards del Dashboard */
+    --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    
+    /* Tablas */
+    --table-header-bg: #f9fafb;
+    --table-row-hover: rgba(5, 150, 105, 0.04);
+    --table-border: #e5e7eb;
+    
+    /* Botones secundarios */
+    --btn-secondary: #6b7280;
+    --btn-secondary-hover: #4b5563;
+    
+    /* Badges */
+    --badge-success: #10b981;
+    --badge-warning: #f59e0b;
+    --badge-danger: #ef4444;
+    --badge-info: #3b82f6;
+}
+
+/* ============================================
+   ESTILOS GLOBALES DEL TEMA CLARO
+   ============================================ */
+
+body[data-theme="light"] {
+    background: var(--bg-gradient);
+    color: var(--text-primary);
+}
+
+/* Sidebar */
+body[data-theme="light"] .sidebar {
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    border-right: 2px solid var(--border-color);
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+}
+
+body[data-theme="light"] .sidebar-link {
+    color: var(--sidebar-text);
+    font-weight: 500;
+}
+
+body[data-theme="light"] .sidebar-link:hover {
+    background: var(--sidebar-hover);
+    color: var(--primary-color);
+}
+
+body[data-theme="light"] .sidebar-link.active {
+    background: var(--sidebar-active);
+    color: var(--primary-color);
+    border-left: 3px solid var(--primary-color);
+    font-weight: 600;
+}
+
+/* Cards */
+body[data-theme="light"] .card {
+    background: var(--card-bg);
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--border-color);
+}
+
+body[data-theme="light"] .card:hover {
+    box-shadow: var(--card-hover-shadow);
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+
+/* Botones primarios */
+body[data-theme="light"] .btn-primary {
+    background: var(--primary-gradient);
+    box-shadow: 0 2px 8px var(--btn-shadow);
+    border: none;
+}
+
+body[data-theme="light"] .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px var(--btn-shadow);
+}
+
+body[data-theme="light"] .btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Tablas */
+body[data-theme="light"] .table {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+}
+
+body[data-theme="light"] .table thead {
+    background: var(--table-header-bg);
+    border-bottom: 2px solid var(--border-color);
+}
+
+body[data-theme="light"] .table thead th {
+    color: var(--text-primary);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+body[data-theme="light"] .table tbody tr {
+    border-bottom: 1px solid var(--table-border);
+}
+
+body[data-theme="light"] .table tbody tr:hover {
+    background: var(--table-row-hover);
+}
+
+body[data-theme="light"] .table tbody tr:last-child {
+    border-bottom: none;
+}
+
+/* Inputs */
+body[data-theme="light"] input,
+body[data-theme="light"] select,
+body[data-theme="light"] textarea {
+    background: var(--input-bg);
+    border: 2px solid var(--input-border);
+    color: var(--text-primary);
+}
+
+body[data-theme="light"] input::placeholder,
+body[data-theme="light"] textarea::placeholder {
+    color: #9ca3af;
+}
+
+body[data-theme="light"] input:focus,
+body[data-theme="light"] select:focus,
+body[data-theme="light"] textarea:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--focus-shadow);
+}
+
+/* Badges */
+body[data-theme="light"] .badge {
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 12px;
+}
+
+body[data-theme="light"] .badge-success {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+body[data-theme="light"] .badge-warning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+body[data-theme="light"] .badge-danger {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+body[data-theme="light"] .badge-info {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+/* Botones secundarios */
+body[data-theme="light"] .btn-secondary {
+    background: #f3f4f6;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+body[data-theme="light"] .btn-secondary:hover {
+    background: #e5e7eb;
+    border-color: #d1d5db;
+}
+
+/* Scrollbar personalizado */
+body[data-theme="light"] ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+body[data-theme="light"] ::-webkit-scrollbar-track {
+    background: #f3f4f6;
+}
+
+body[data-theme="light"] ::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 5px;
+}
+
+body[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+}

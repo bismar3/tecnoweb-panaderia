@@ -81,6 +81,15 @@ app.get('/api/debug/table/:tableName', async (req, res) => {
 
 // Rutas de autenticación
 app.use('/api/auth', authRoutes);
+// Rutas de usuarios
+const usuarioRoutes = require('./src/routes/usuarioRoutes');
+app.use('/api/usuarios', usuarioRoutes);
+// Rutas de roles
+const rolRoutes = require('./src/routes/rolRoutes');
+app.use('/api/roles', rolRoutes);
+// Rutas de permisos
+const permisoRoutes = require('./src/routes/permisoRoutes');
+app.use('/api/permisos', permisoRoutes);
 // Rutas de productos
 app.use('/api/productos', productoRoutes);
 // Rutas de clientes 

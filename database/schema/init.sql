@@ -165,7 +165,7 @@ CREATE TABLE producciones (
     cantidad_producida DECIMAL(10,2) DEFAULT 0,
     fecha_inicio TIMESTAMP NOT NULL,
     fecha_fin TIMESTAMP,
-    estado VARCHAR(20) DEFAULT 'pendiente',
+    estado VARCHAR(20) DEFAULT 'pendiente', 
     id_usuario INTEGER REFERENCES usuarios(id_usuario),
     observaciones TEXT,
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistema de Gestión</title>
+    <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/themes/theme-default.css" id="theme-link">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <h1>🍞 Panadería</h1>
+                <p>Sistema de Gestión</p>
+            </div>
+
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="email">
+                        <span class="icon">📧</span>
+                        Correo Electrónico
+                    </label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        placeholder="tu@email.com"
+                        required
+                        autocomplete="email"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="password">
+                        <span class="icon">🔒</span>
+                        Contraseña
+                    </label>
+                    <div class="password-input">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            placeholder="••••••••"
+                            required
+                            autocomplete="current-password"
+                        >
+                        <button type="button" class="toggle-password" onclick="togglePassword()">
+                            👁️
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-options">
+                    <label class="checkbox">
+                        <input type="checkbox" id="remember">
+                        <span>Recordarme</span>
+                    </label>
+                    <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
+                </div>
+
+                <button type="submit" class="btn-login">
+                    Iniciar Sesión
+                </button>
+
+                <div class="alert" id="alert" style="display: none;"></div>
+            </form>
+
+            <div class="theme-switcher">
+                <button onclick="changeTheme('default')" class="theme-btn" title="Predeterminado">🌈</button>
+                <button onclick="changeTheme('dark')" class="theme-btn" title="Oscuro">🌙</button>
+                <button onclick="changeTheme('light')" class="theme-btn" title="Claro">☀️</button>
+            </div>
+
+            <div class="login-footer">
+                <p>&copy; 2025 Sistema de Gestión. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/theme-switcher.js"></script>
+</body>
+</html>

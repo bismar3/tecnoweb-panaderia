@@ -1,156 +1,51 @@
 /* ============================================
-   TEMA PREDETERMINADO - MODERNO Y PROFESIONAL
-   Colores: Gradiente Azul-Púrpura
+   TEMA PREDETERMINADO - PANADERÍA BELÉN
    ============================================ */
 
 :root {
-    /* Colores primarios */
-    --primary-color: #6366f1;
-    --primary-hover: #4f46e5;
-    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    /* Colores principales */
+    --primary-color: #667eea;
+    --primary-hover: #5568d3;
+    --primary-light: #e8f0fe;
     
-    /* Fondos */
-    --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --card-bg: rgba(255, 255, 255, 0.95);
-    --input-bg: #ffffff;
-    --hover-bg: rgba(99, 102, 241, 0.1);
+    /* Gradientes */
+    --bg-gradient-start: #667eea;
+    --bg-gradient-end: #764ba2;
+    
+    /* Backgrounds */
+    --bg-primary: #f5f7fa;
+    --card-bg: #ffffff;
+    --input-bg: #f7f9fc;
+    --input-focus-bg: #ffffff;
+    --footer-bg: #f7f9fc;
     
     /* Textos */
-    --text-primary: #1f2937;
-    --text-secondary: #6b7280;
+    --text-primary: #333333;
+    --text-secondary: #666666;
+    --text-light: #999999;
     
     /* Bordes */
-    --border-color: rgba(99, 102, 241, 0.2);
-    --input-border: #e5e7eb;
+    --border-color: #e1e8ed;
     
     /* Sombras */
-    --shadow: 0 20px 50px rgba(99, 102, 241, 0.3);
-    --focus-shadow: rgba(99, 102, 241, 0.25);
-    --btn-shadow: rgba(99, 102, 241, 0.4);
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 8px 20px rgba(0, 0, 0, 0.15);
     
-    /* Alertas - Success */
-    --success-bg: #d1fae5;
-    --success-color: #065f46;
-    --success-border: #6ee7b7;
+    /* Estados */
+    --success-color: #2ecc71;
+    --error-color: #e74c3c;
+    --warning-color: #f39c12;
+    --info-color: #3498db;
     
-    /* Alertas - Error */
-    --error-bg: #fee2e2;
-    --error-color: #991b1b;
-    --error-border: #fca5a5;
-    
-    /* Dashboard */
-    --sidebar-bg: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
-    --sidebar-text: #ffffff;
-    --sidebar-hover: rgba(255, 255, 255, 0.15);
-    --sidebar-active: rgba(255, 255, 255, 0.25);
-    
-    /* Cards del Dashboard */
-    --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    --card-hover-shadow: 0 10px 15px rgba(0, 0, 0, 0.15);
-    
-    /* Tablas */
-    --table-header-bg: #f3f4f6;
-    --table-row-hover: rgba(99, 102, 241, 0.05);
-    --table-border: #e5e7eb;
-    
-    /* Botones secundarios */
-    --btn-secondary: #6b7280;
-    --btn-secondary-hover: #4b5563;
-    
-    /* Badges */
-    --badge-success: #10b981;
-    --badge-warning: #f59e0b;
-    --badge-danger: #ef4444;
-    --badge-info: #3b82f6;
+    /* Transiciones */
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.5s ease;
 }
-
-/* ============================================
-   ESTILOS GLOBALES DEL TEMA
-   ============================================ */
 
 body[data-theme="default"] {
-    background: var(--bg-gradient);
+    background: var(--bg-primary);
     color: var(--text-primary);
-}
-
-/* Sidebar */
-body[data-theme="default"] .sidebar {
-    background: var(--sidebar-bg);
-    color: var(--sidebar-text);
-}
-
-body[data-theme="default"] .sidebar-link {
-    color: var(--sidebar-text);
-}
-
-body[data-theme="default"] .sidebar-link:hover {
-    background: var(--sidebar-hover);
-}
-
-body[data-theme="default"] .sidebar-link.active {
-    background: var(--sidebar-active);
-}
-
-/* Cards */
-body[data-theme="default"] .card {
-    background: var(--card-bg);
-    box-shadow: var(--card-shadow);
-    border: 1px solid var(--border-color);
-}
-
-body[data-theme="default"] .card:hover {
-    box-shadow: var(--card-hover-shadow);
-}
-
-/* Botones primarios */
-body[data-theme="default"] .btn-primary {
-    background: var(--primary-gradient);
-    box-shadow: 0 4px 15px var(--btn-shadow);
-}
-
-body[data-theme="default"] .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px var(--btn-shadow);
-}
-
-/* Tablas */
-body[data-theme="default"] .table thead {
-    background: var(--table-header-bg);
-}
-
-body[data-theme="default"] .table tbody tr:hover {
-    background: var(--table-row-hover);
-}
-
-/* Inputs */
-body[data-theme="default"] input,
-body[data-theme="default"] select,
-body[data-theme="default"] textarea {
-    background: var(--input-bg);
-    border: 2px solid var(--input-border);
-    color: var(--text-primary);
-}
-
-body[data-theme="default"] input:focus,
-body[data-theme="default"] select:focus,
-body[data-theme="default"] textarea:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px var(--focus-shadow);
-}
-
-/* Badges */
-body[data-theme="default"] .badge-success {
-    background: var(--badge-success);
-}
-
-body[data-theme="default"] .badge-warning {
-    background: var(--badge-warning);
-}
-
-body[data-theme="default"] .badge-danger {
-    background: var(--badge-danger);
-}
-
-body[data-theme="default"] .badge-info {
-    background: var(--badge-info);
+    transition: background var(--transition-normal), color var(--transition-normal);
 }

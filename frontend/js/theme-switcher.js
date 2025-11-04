@@ -64,10 +64,15 @@ function updateThemeButtons(activeTheme) {
 
 // Función para cambiar tema manualmente
 function changeTheme(theme) {
-    applyTheme(theme);
-    
-    // Mostrar notificación
-    showThemeNotification(theme);
+  const link = document.getElementById("theme-link");
+
+  if (theme === "default") {
+    link.href = "../css/themes/theme-default.css";
+  } else if (theme === "dark") {
+    link.href = "../css/themes/theme-dark.css";
+  } else if (theme === "light") {
+    link.href = "../css/themes/theme-light.css";
+  }
 }
 
 // Mostrar notificación de cambio de tema

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Catálogo - Panadería Belén</title>
+  <link rel="stylesheet" href="../css/catalogo.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body data-theme="light">
+  <header class="topbar">
+    <div class="brand-name">
+      <a href="catalogo.html">
+        <i class="fas fa-bread-slice"></i>
+        Panadería Belén
+      </a>
+    </div>
+    <nav>
+      <a href="catalogo.html">
+        <i class="fas fa-home"></i> Inicio
+      </a>
+      
+      <div class="dropdown" id="ubicacionDropdown">
+        <button class="dropdown-btn" onclick="toggleDropdown('ubicacionMenu')">
+          <i class="fas fa-map-marker-alt"></i> Ubicación
+          <i class="fas fa-chevron-down category-icon"></i>
+        </button>
+        <div class="dropdown-menu" id="ubicacionMenu">
+          <a href="#"><i class="fas fa-map-pin"></i> La Paz</a>
+          <a href="#"><i class="fas fa-map-pin"></i> El Alto</a>
+          <a href="#"><i class="fas fa-map-pin"></i> Cochabamba</a>
+          <a href="#"><i class="fas fa-map-pin"></i> Santa Cruz</a>
+        </div>
+      </div>
+
+      <a href="#">
+        <i class="fas fa-phone"></i> Contacto
+      </a>
+
+      <div class="dropdown" id="themeDropdown">
+        <button class="dropdown-btn" onclick="toggleDropdown('themeMenu')">
+          <i class="fas fa-palette"></i> Tema
+          <i class="fas fa-chevron-down category-icon"></i>
+        </button>
+        <div class="dropdown-menu" id="themeMenu">
+          <button onclick="changeTheme('light')">
+            <i class="fas fa-sun"></i> Claro
+          </button>
+          <button onclick="changeTheme('dark')">
+            <i class="fas fa-moon"></i> Oscuro
+          </button>
+          <button onclick="changeTheme('default')">
+            <i class="fas fa-bread-slice"></i> Panadería
+          </button>
+        </div>
+      </div>
+
+      <div class="dropdown" id="userDropdown">
+        <i class="fas fa-user login-icon" onclick="toggleDropdown('userMenu')"></i>
+        <div class="dropdown-menu" id="userMenu"></div>
+      </div>
+    </nav>
+  </header>
+
+  <main class="catalog-layout">
+    <aside class="sidebar">
+      <h3>
+        <i class="fas fa-list"></i> Categorías
+      </h3>
+      <ul>
+        <li class="category-item">
+          <button class="category-header" onclick="toggleCategory(this)">
+            <span><i class="fas fa-bread-slice"></i> Pan Francés</span>
+            <i class="fas fa-chevron-down category-icon"></i>
+          </button>
+          <div class="subcategories">
+            <a href="#">Pan simple</a>
+            <a href="#">Pan integral</a>
+            <a href="#">Pan de ajo</a>
+            <a href="#">Baguette</a>
+          </div>
+        </li>
+
+        <li class="category-item">
+          <button class="category-header" onclick="toggleCategory(this)">
+            <span><i class="fas fa-bread-slice"></i> Pan Molde</span>
+            <i class="fas fa-chevron-down category-icon"></i>
+          </button>
+          <div class="subcategories">
+            <a href="#">Pan blanco</a>
+            <a href="#">Pan integral</a>
+            <a href="#">Pan de leche</a>
+            <a href="#">Pan sin sal</a>
+          </div>
+        </li>
+
+        <li class="category-item">
+          <button class="category-header" onclick="toggleCategory(this)">
+            <span><i class="fas fa-cookie"></i> Horneados</span>
+            <i class="fas fa-chevron-down category-icon"></i>
+          </button>
+          <div class="subcategories">
+            <a href="#">Empanadas</a>
+            <a href="#">Salteñas</a>
+            <a href="#">Tucumanas</a>
+            <a href="#">Cuñapés</a>
+          </div>
+        </li>
+
+        <li class="category-item">
+          <button class="category-header" onclick="toggleCategory(this)">
+            <span><i class="fas fa-birthday-cake"></i> Repostería</span>
+            <i class="fas fa-chevron-down category-icon"></i>
+          </button>
+          <div class="subcategories">
+            <a href="#">Tortas</a>
+            <a href="#">Pasteles</a>
+            <a href="#">Galletas</a>
+            <a href="#">Postres</a>
+          </div>
+        </li>
+      </ul>
+    </aside>
+
+    <section class="catalog">
+      <h1>Nuestros Productos</h1>
+
+      <div class="products-grid">
+        <div class="product-card">
+          <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400" alt="Pan Francés" class="product-img" />
+          <h2>Pan Francés</h2>
+          <p>Pan crujiente recién horneado</p>
+          <span class="product-price">Bs 1,00</span>
+          <form class="add-cart-form" onsubmit="return addToCart(event)">
+            <button type="submit" class="btn-primary">
+              <i class="fas fa-shopping-cart"></i> Agregar al Carrito
+            </button>
+          </form>
+        </div>
+
+        <div class="product-card">
+          <img src="https://images.unsplash.com/photo-1586444248902-2f64eddc13df?w=400" alt="Pan Integral" class="product-img" />
+          <h2>Pan Integral</h2>
+          <p>Saludable y nutritivo</p>
+          <span class="product-price">Bs 2,50</span>
+          <form class="add-cart-form" onsubmit="return addToCart(event)">
+            <button type="submit" class="btn-primary">
+              <i class="fas fa-shopping-cart"></i> Agregar al Carrito
+            </button>
+          </form>
+        </div>
+
+        <div class="product-card">
+          <img src="https://images.unsplash.com/photo-1608198093002-ad4e005484ec?w=400" alt="Empanadas" class="product-img" />
+          <h2>Empanadas</h2>
+          <p>Rellenas de carne o pollo</p>
+          <span class="product-price">Bs 5,00</span>
+          <form class="add-cart-form" onsubmit="return addToCart(event)">
+            <button type="submit" class="btn-primary">
+              <i class="fas fa-shopping-cart"></i> Agregar al Carrito
+            </button>
+          </form>
+        </div>
+
+        <div class="product-card">
+          <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400" alt="Torta" class="product-img" />
+          <h2>Torta Especial</h2>
+          <p>Para toda ocasión</p>
+          <span class="product-price">Bs 80,00</span>
+          <form class="add-cart-form" onsubmit="return addToCart(event)">
+            <button type="submit" class="btn-primary">
+              <i class="fas fa-shopping-cart"></i> Agregar al Carrito
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="modalCrearCuenta" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h3>Crear Cuenta Cliente</h3>
+      <form id="formCrearCuenta" onsubmit="return handleRegistro(event)">
+        <input type="text" name="nombre" placeholder="Nombre completo" required>
+        <input type="email" name="email" placeholder="Correo electrónico" required>
+        <input type="text" name="telefono" placeholder="Teléfono">
+        <input type="text" name="direccion" placeholder="Dirección">
+        <input type="text" name="nit" placeholder="NIT o documento">
+        <input type="password" name="password" placeholder="Contraseña" minlength="8" required>
+        <input type="password" name="confirmPassword" placeholder="Confirmar Contraseña" minlength="8" required>
+        <button type="submit" class="btn-primary" style="margin-top:15px;">
+          <i class="fas fa-user-plus"></i> Registrarse
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script src="../js/catalogo.js"></script>
+</body>
+</html>

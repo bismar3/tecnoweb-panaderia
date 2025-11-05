@@ -433,7 +433,7 @@
                     
                     // Redirigir al catálogo después de 1 segundo
                     setTimeout(() => {
-                        window.location.href = './dashboard.html';
+                        window.location.href = 'dashboard.html';
                     }, 1000);
                 } else {
                     let errorMsg = result.message || 'Credenciales inválidas';
@@ -493,7 +493,7 @@
             const token = localStorage.getItem('token') || sessionStorage.getItem('token');
             if (token) {
                 // Ya está autenticado, redirigir al catálogo
-                window.location.href = './catalogo.html';
+                window.location.href = 'catalogo.html';
             }
         });
 

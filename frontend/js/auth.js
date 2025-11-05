@@ -90,7 +90,7 @@ function logout() {
     sessionStorage.removeItem('userData');
     
     // Redirigir al login
-    window.location.href = 'login.html';
+    window.location.href = './login.html';
 }
 
 // ============================================

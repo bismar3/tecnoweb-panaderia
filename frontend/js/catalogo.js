@@ -185,4 +185,4 @@ function addToCart(e) {
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
   checkAuth();
-});;
+});

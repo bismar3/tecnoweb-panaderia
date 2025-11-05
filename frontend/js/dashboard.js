@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Cargar módulo por defecto (home)
-  loadModule('productos');
+    loadModule('productos');
 });
 
 // ============================================
@@ -133,8 +133,8 @@ async function loadModule(moduleName) {
     `;
     
     try {
-        // Fetch del HTML del módulo
-        const response = await fetch(`modulo/${moduleName}.html`);
+        // ✅ CORREGIDO: Ruta correcta /page/ en lugar de modulo/
+        const response = await fetch(`/page/${moduleName}.html`);
         
         if (!response.ok) {
             mainContent.innerHTML = `
@@ -154,16 +154,39 @@ async function loadModule(moduleName) {
         }
         
         const html = await response.text();
-        mainContent.innerHTML = html;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
         
-        // Ejecutar script del módulo si existe
-        const initFunctionName = `init${capitalize(moduleName)}Module`;
-        if (typeof window[initFunctionName] === 'function') {
-            console.log(`Ejecutando ${initFunctionName}()`);
-            window[initFunctionName]();
-        } else {
-            console.log(`Función ${initFunctionName} no encontrada`);
-        }
+        // Cargar solo el body
+        mainContent.innerHTML = doc.body.innerHTML;
+        
+        // Re-ejecutar scripts
+        const scripts = mainContent.querySelectorAll('script');
+        scripts.forEach(oldScript => {
+            const newScript = document.createElement('script');
+            
+            // Mantener el type="module" si lo tiene
+            if (oldScript.type) {
+                newScript.type = oldScript.type;
+            }
+            
+            if (oldScript.src) {
+                newScript.src = oldScript.src;
+            }
+            
+            newScript.textContent = oldScript.textContent;
+            
+            // Copiar atributos
+            Array.from(oldScript.attributes).forEach(attr => {
+                if (attr.name !== 'src' && attr.name !== 'type') {
+                    newScript.setAttribute(attr.name, attr.value);
+                }
+            });
+            
+            oldScript.parentNode.replaceChild(newScript, oldScript);
+        });
+        
+        console.log(`✅ Módulo ${moduleName} cargado correctamente`);
         
     } catch (error) {
         console.error('Error al cargar módulo:', error);

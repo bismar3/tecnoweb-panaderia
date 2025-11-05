@@ -132,6 +132,9 @@ app.use('/api/proveedores', proveedorRoutes);
 // Rutas de promociones
 const promocionRoutes = require('./src/routes/promocionRoutes');
 app.use('/api/promociones', promocionRoutes);
+// Rutas de categorias
+const categoriaRoutes = require('./src/routes/categoriaRoutes'); // ← AGREGAR
+app.use('/api/categorias', categoriaRoutes); // ← AGREGAR
 
 // Manejo de rutas no encontradas (404)
 app.use((req, res) => {

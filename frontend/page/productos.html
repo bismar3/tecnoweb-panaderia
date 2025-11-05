@@ -1,0 +1,304 @@
+<!-- productos.html - SIN <html>, <head>, solo contenido -->
+<div class="productos-container" style="padding: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h1><i class="fas fa-boxes"></i> Gestión de Productos</h1>
+        <button id="btnNuevoProducto" style="background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+            <i class="fas fa-plus"></i> Nuevo Producto
+        </button>
+    </div>
+
+    <!-- Filtros -->
+    <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+            <input type="text" id="buscarProducto" placeholder="Buscar producto..." style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+            <select id="filtroCategoria" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                <option value="">Todas las categorías</option>
+            </select>
+            <select id="filtroEstado" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                <option value="">Todos los estados</option>
+                <option value="true">Activo</option>
+                <option value="false">Inactivo</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Tabla -->
+    <div style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <table id="tablaProductos" style="width: 100%; border-collapse: collapse;">
+            <thead style="background: #f3f4f6;">
+                <tr>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Código</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Nombre</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Categoría</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Unidad</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Precio</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Estado</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <!-- Modal -->
+    <div id="modalProducto" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;">
+        <div style="background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 id="modalTitle">Nuevo Producto</h2>
+                <button id="btnCerrarModal" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #666;">&times;</button>
+            </div>
+            <form id="formProducto">
+                <input type="hidden" name="id_producto">
+                
+                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Código:</label>
+                <input type="text" name="codigo" required style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+                
+                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Nombre:</label>
+                <input type="text" name="nombre" required style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+                
+                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Descripción:</label>
+                <textarea name="descripcion" rows="3" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;"></textarea>
+                
+                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Categoría:</label>
+                <select name="id_categoria" id="selectCategoria" required style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px;">
+                    <option value="">Seleccionar categoría</option>
+                </select>
+                
+                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Unidad de Medida:</label>
+                <input type="text" name="unidad_medida" placeholder="Ej: kg, unidad, paquete" required style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+                
+                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Precio de Venta:</label>
+                <input type="number" name="precio_venta" step="0.01" min="0" required style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+                
+                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Estado:</label>
+                <select name="estado" style="width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 5px;">
+                    <option value="true">Activo</option>
+                    <option value="false">Inactivo</option>
+                </select>
+                
+                <button type="submit" style="width: 100%; background: #10b981; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: 600;">
+                    <i class="fas fa-save"></i> Guardar Producto
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+(async function() {
+    console.log('🚀 Inicializando módulo de productos...');
+    
+    // Obtener api desde window
+    const api = window.api;
+    
+    if (!api) {
+        console.error('❌ API no está disponible. Asegúrate de cargar api.js antes.');
+        return;
+    }
+    
+    const tabla = document.querySelector('#tablaProductos tbody');
+    const modal = document.getElementById('modalProducto');
+    const form = document.getElementById('formProducto');
+    const btnNuevo = document.getElementById('btnNuevoProducto');
+    const btnCerrar = document.getElementById('btnCerrarModal');
+    const selectCategoria = document.getElementById('selectCategoria');
+    const filtroCategoria = document.getElementById('filtroCategoria');
+
+    if (!tabla || !modal || !form) {
+        console.error('❌ Elementos del DOM no encontrados');
+        return;
+    }
+
+    // Mostrar modal
+    btnNuevo.onclick = () => {
+        form.reset();
+        form.querySelector('[name="id_producto"]').value = '';
+        document.getElementById('modalTitle').textContent = 'Nuevo Producto';
+        modal.style.display = 'flex';
+    };
+
+    // Cerrar modal
+    btnCerrar.onclick = () => modal.style.display = 'none';
+    
+    // Cerrar modal al hacer click fuera
+    modal.onclick = (e) => {
+        if (e.target === modal) modal.style.display = 'none';
+    };
+
+    // Cargar categorías
+    async function cargarCategorias() {
+        try {
+            const response = await api.get('/categorias');
+            console.log('📂 Respuesta categorías:', response.data);
+            
+            // ✅ Acceder a response.data.data (formato del backend)
+            const categorias = response.data.data || response.data;
+            
+            if (!Array.isArray(categorias)) {
+                console.error('❌ Categorías no es un array:', categorias);
+                selectCategoria.innerHTML = '<option value="">Error: Formato incorrecto</option>';
+                return;
+            }
+            
+            const options = categorias.map(c => 
+                `<option value="${c.id_categoria}">${c.nombre}</option>`
+            ).join('');
+            
+            selectCategoria.innerHTML = '<option value="">Seleccionar categoría</option>' + options;
+            filtroCategoria.innerHTML = '<option value="">Todas las categorías</option>' + options;
+            
+            console.log('✅ Categorías cargadas:', categorias.length);
+        } catch (error) {
+            console.error('❌ Error cargando categorías:', error);
+            selectCategoria.innerHTML = '<option value="">Error al cargar</option>';
+        }
+    }
+
+    // Cargar productos
+    async function cargarProductos() {
+        try {
+            console.log('📦 Cargando productos...');
+            const response = await api.get('/productos');
+            console.log('📦 Respuesta productos:', response.data);
+            
+            // ✅ Acceder a response.data.data (formato del backend)
+            const productos = response.data.data || response.data;
+            
+            if (!Array.isArray(productos)) {
+                console.error('❌ Productos no es un array:', productos);
+                tabla.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px; color: red;">Error: Formato de datos incorrecto</td></tr>';
+                return;
+            }
+            
+            console.log('✅ Productos cargados:', productos.length);
+            
+            if (productos.length === 0) {
+                tabla.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px; color: #666;">No hay productos registrados</td></tr>';
+                return;
+            }
+            
+            tabla.innerHTML = productos.map(p => `
+                <tr>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${p.codigo || 'N/A'}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${p.nombre || 'N/A'}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${p.categoria_nombre || 'Sin categoría'}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${p.unidad_medida || 'N/A'}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">Bs. ${parseFloat(p.precio_venta || 0).toFixed(2)}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
+                        <span style="background: ${p.estado ? '#10b981' : '#ef4444'}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
+                            ${p.estado ? 'Activo' : 'Inactivo'}
+                        </span>
+                    </td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
+                        <button class="btn-edit" data-id="${p.id_producto}" style="background: #3b82f6; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 5px;">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-delete" data-id="${p.id_producto}" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+
+            // Event delegation para botones
+            tabla.querySelectorAll('.btn-edit').forEach(btn => {
+                btn.onclick = () => editarProducto(btn.dataset.id);
+            });
+            tabla.querySelectorAll('.btn-delete').forEach(btn => {
+                btn.onclick = () => eliminarProducto(btn.dataset.id);
+            });
+
+        } catch (error) {
+            console.error('❌ Error al cargar productos:', error);
+            tabla.innerHTML = `
+                <tr>
+                    <td colspan="7" style="text-align:center; padding: 20px; color: red;">
+                        Error al cargar productos: ${error.response?.data?.message || error.message}
+                        <br><small>Verifica que el backend esté corriendo en puerto 3000</small>
+                    </td>
+                </tr>
+            `;
+        }
+    }
+
+    // Guardar producto
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+        
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData);
+        
+        // Convertir estado a boolean
+        data.estado = data.estado === 'true';
+        
+        // Convertir precio a número
+        data.precio_venta = parseFloat(data.precio_venta);
+
+        try {
+            const idProducto = data.id_producto;
+            
+            if (idProducto) {
+                // Actualizar
+                await api.put(`/productos/${idProducto}`, data);
+                alert('✅ Producto actualizado correctamente');
+            } else {
+                // Crear nuevo
+                delete data.id_producto;
+                await api.post('/productos', data);
+                alert('✅ Producto creado correctamente');
+            }
+            
+            modal.style.display = 'none';
+            cargarProductos();
+            
+        } catch (error) {
+            console.error('Error al guardar:', error);
+            alert('❌ Error al guardar producto: ' + (error.response?.data?.message || error.message));
+        }
+    };
+
+    // Editar producto
+    async function editarProducto(id) {
+        try {
+            const response = await api.get(`/productos/${id}`);
+            const p = response.data.data || response.data;
+            
+            form.querySelector('[name="id_producto"]').value = p.id_producto;
+            form.querySelector('[name="codigo"]').value = p.codigo;
+            form.querySelector('[name="nombre"]').value = p.nombre;
+            form.querySelector('[name="descripcion"]').value = p.descripcion || '';
+            form.querySelector('[name="id_categoria"]').value = p.id_categoria;
+            form.querySelector('[name="unidad_medida"]').value = p.unidad_medida;
+            form.querySelector('[name="precio_venta"]').value = p.precio_venta;
+            form.querySelector('[name="estado"]').value = p.estado.toString();
+            
+            document.getElementById('modalTitle').textContent = 'Editar Producto';
+            modal.style.display = 'flex';
+            
+        } catch (error) {
+            console.error('Error:', error);
+            alert('❌ Error al cargar producto para editar');
+        }
+    }
+
+    // Eliminar producto
+    async function eliminarProducto(id) {
+        if (!confirm('¿Estás seguro de eliminar este producto?')) return;
+        
+        try {
+            await api.delete(`/productos/${id}`);
+            alert('✅ Producto eliminado correctamente');
+            cargarProductos();
+        } catch (error) {
+            console.error('Error:', error);
+            alert('❌ Error al eliminar producto: ' + (error.response?.data?.message || error.message));
+        }
+    }
+
+    // Inicializar
+    await cargarCategorias();
+    await cargarProductos();
+    
+    console.log('✅ Módulo de productos inicializado correctamente');
+})();
+</script>

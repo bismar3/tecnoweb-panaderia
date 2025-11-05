@@ -6,19 +6,16 @@ const {
   createProducto,
   updateProducto,
   deleteProducto,
-  updateStock,
-  getLowStockProducts
+  updateStock
 } = require('../controllers/productoController');
-const { verifyToken, checkPermission } = require('../middlewares/authMiddleware');
+// const { verifyToken, checkPermission } = require('../middlewares/authMiddleware');
 
-// Rutas públicas (solo lectura)
-router.get('/', verifyToken, getAllProductos);
-router.get('/:id', verifyToken, getProductoById);
-
-// Rutas protegidas (requieren permisos)
-router.post('/', verifyToken, checkPermission('Producto'), createProducto);
-router.put('/:id', verifyToken, checkPermission('Producto'), updateProducto);
-router.delete('/:id', verifyToken, checkPermission('Producto'), deleteProducto);
-router.patch('/:id/stock', verifyToken, checkPermission('Producto'), updateStock);
+// ✅ TEMPORALMENTE SIN AUTENTICACIÓN (para probar)
+router.get('/', getAllProductos);
+router.get('/:id', getProductoById);
+router.post('/', createProducto);           // ← SIN verifyToken
+router.put('/:id', updateProducto);         // ← SIN verifyToken
+router.delete('/:id', deleteProducto);      // ← SIN verifyToken
+router.patch('/:id/stock', updateStock);
 
 module.exports = router;

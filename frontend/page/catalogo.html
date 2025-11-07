@@ -6,6 +6,325 @@
   <title>Catálogo - Panadería Belén</title>
   <link rel="stylesheet" href="../css/catalogo.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+  <style>
+    /* Estilos adicionales */
+    .location-display {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 12px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      font-size: 0.85em;
+      margin-left: 8px;
+    }
+
+    /* Modal de ubicación */
+    .modal-ubicacion-content {
+      max-width: 900px;
+      max-height: 90vh;
+      width: 95%;
+    }
+
+    #map {
+      width: 100%;
+      height: 550px;
+      min-height: 550px;
+      border-radius: 12px;
+      margin: 1.5rem 0;
+      border: 3px solid var(--accent);
+      background: #e8e8e8;
+      position: relative;
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+
+    .map-header {
+      background: linear-gradient(135deg, var(--accent) 0%, #0d9468 100%);
+      color: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      text-align: center;
+      margin-bottom: 0;
+      font-size: 1.3em;
+      font-weight: 700;
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    .map-header i {
+      margin-right: 10px;
+      font-size: 1.2em;
+    }
+
+    .panaderia-info {
+      background: var(--bg-primary);
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .info-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .info-item i {
+      font-size: 1.5em;
+      color: var(--accent);
+      min-width: 30px;
+    }
+
+    .info-item div {
+      flex: 1;
+    }
+
+    .info-item strong {
+      display: block;
+      color: var(--text-primary);
+      font-size: 0.9em;
+      margin-bottom: 4px;
+    }
+
+    .info-item span {
+      color: var(--text-secondary);
+      font-size: 0.95em;
+    }
+
+    /* Ícono de producto */
+    .product-icon {
+      width: 100%;
+      height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      margin-bottom: 1rem;
+      font-size: 4rem;
+      background: linear-gradient(135deg, var(--accent) 0%, #0d9468 100%);
+      color: white;
+      box-shadow: 0 4px 8px var(--shadow);
+    }
+
+    /* Loading */
+    .loading {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-secondary);
+    }
+
+    .loading i {
+      font-size: 3rem;
+      color: var(--accent);
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Paginación */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .pagination button {
+      padding: 0.5rem 1rem;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .pagination button:hover:not(:disabled) {
+      transform: scale(1.05);
+      box-shadow: 0 4px 8px var(--shadow);
+    }
+
+    .pagination button:disabled {
+      background: var(--text-secondary);
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .pagination .page-info {
+      color: var(--text-primary);
+      font-weight: 600;
+      padding: 0.5rem 1rem;
+      background: var(--bg-secondary);
+      border-radius: 6px;
+    }
+
+    .pagination .page-numbers {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .pagination .page-numbers button {
+      min-width: 40px;
+    }
+
+    .pagination .page-numbers button.active {
+      background: var(--text-primary);
+    }
+
+    /* Badge de categoría */
+    .category-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      background: var(--hover-bg);
+      color: var(--accent);
+      border-radius: 12px;
+      font-size: 0.85em;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Sin productos */
+    .no-products {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-secondary);
+    }
+
+    .no-products i {
+      font-size: 4rem;
+      color: var(--accent);
+      opacity: 0.3;
+      margin-bottom: 1rem;
+    }
+
+    /* Filtros activos */
+    .active-filters {
+      margin-bottom: 1rem;
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--accent);
+      color: white;
+      border-radius: 20px;
+      font-size: 0.9em;
+    }
+
+    .filter-tag button {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 1.2em;
+      padding: 0;
+      margin-left: 0.5rem;
+    }
+
+    /* Loading skeleton */
+    .skeleton {
+      animation: skeleton-loading 1s linear infinite alternate;
+    }
+
+    @keyframes skeleton-loading {
+      0% { opacity: 0.6; }
+      100% { opacity: 1; }
+    }
+
+    /* Buscador */
+    .search-box {
+      position: relative;
+      display: flex;
+      align-items: center;
+      background: var(--bg-primary);
+      border: 2px solid var(--border-color);
+      border-radius: 25px;
+      padding: 0.5rem 1rem;
+      min-width: 300px;
+      max-width: 500px;
+      flex: 1;
+      transition: all 0.3s;
+    }
+
+    .search-box:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+
+    .search-box i.fa-search {
+      color: var(--text-secondary);
+      margin-right: 0.75rem;
+    }
+
+    .search-box input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: var(--text-primary);
+      font-size: 1rem;
+      outline: none;
+      padding: 0;
+    }
+
+    .search-box input::placeholder {
+      color: var(--text-secondary);
+    }
+
+    .search-box button {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 0.25rem 0.5rem;
+      font-size: 1.2em;
+      transition: all 0.2s;
+      margin-left: 0.5rem;
+    }
+
+    .search-box button:hover {
+      color: var(--accent);
+      transform: scale(1.1);
+    }
+
+    /* Resultados de búsqueda */
+    .search-results {
+      color: var(--text-secondary);
+      font-size: 0.9em;
+      padding: 0.5rem 1rem;
+      background: var(--bg-secondary);
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    .search-results i {
+      color: var(--accent);
+      margin-right: 0.5rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .search-box {
+        min-width: 100%;
+        max-width: 100%;
+      }
+    }
+  </style>
 </head>
 <body data-theme="light">
   <header class="topbar">
@@ -21,16 +340,10 @@
       </a>
       
       <div class="dropdown" id="ubicacionDropdown">
-        <button class="dropdown-btn" onclick="toggleDropdown('ubicacionMenu')">
+        <button class="dropdown-btn" onclick="openUbicacionModal()">
           <i class="fas fa-map-marker-alt"></i> Ubicación
           <i class="fas fa-chevron-down category-icon"></i>
         </button>
-        <div class="dropdown-menu" id="ubicacionMenu">
-          <a href="#"><i class="fas fa-map-pin"></i> La Paz</a>
-          <a href="#"><i class="fas fa-map-pin"></i> El Alto</a>
-          <a href="#"><i class="fas fa-map-pin"></i> Cochabamba</a>
-          <a href="#"><i class="fas fa-map-pin"></i> Santa Cruz</a>
-        </div>
       </div>
 
       <a href="#">
@@ -67,116 +380,95 @@
       <h3>
         <i class="fas fa-list"></i> Categorías
       </h3>
-      <ul>
-        <li class="category-item">
-          <button class="category-header" onclick="toggleCategory(this)">
-            <span><i class="fas fa-bread-slice"></i> Pan Francés</span>
-            <i class="fas fa-chevron-down category-icon"></i>
-          </button>
-          <div class="subcategories">
-            <a href="#">Pan simple</a>
-            <a href="#">Pan integral</a>
-            <a href="#">Pan de ajo</a>
-            <a href="#">Baguette</a>
-          </div>
-        </li>
-
-        <li class="category-item">
-          <button class="category-header" onclick="toggleCategory(this)">
-            <span><i class="fas fa-bread-slice"></i> Pan Molde</span>
-            <i class="fas fa-chevron-down category-icon"></i>
-          </button>
-          <div class="subcategories">
-            <a href="#">Pan blanco</a>
-            <a href="#">Pan integral</a>
-            <a href="#">Pan de leche</a>
-            <a href="#">Pan sin sal</a>
-          </div>
-        </li>
-
-        <li class="category-item">
-          <button class="category-header" onclick="toggleCategory(this)">
-            <span><i class="fas fa-cookie"></i> Horneados</span>
-            <i class="fas fa-chevron-down category-icon"></i>
-          </button>
-          <div class="subcategories">
-            <a href="#">Empanadas</a>
-            <a href="#">Salteñas</a>
-            <a href="#">Tucumanas</a>
-            <a href="#">Cuñapés</a>
-          </div>
-        </li>
-
-        <li class="category-item">
-          <button class="category-header" onclick="toggleCategory(this)">
-            <span><i class="fas fa-birthday-cake"></i> Repostería</span>
-            <i class="fas fa-chevron-down category-icon"></i>
-          </button>
-          <div class="subcategories">
-            <a href="#">Tortas</a>
-            <a href="#">Pasteles</a>
-            <a href="#">Galletas</a>
-            <a href="#">Postres</a>
-          </div>
+      <ul id="categoriasList">
+        <!-- Categorías dinámicas se cargarán aquí -->
+        <li class="loading">
+          <i class="fas fa-spinner"></i>
+          <p>Cargando categorías...</p>
         </li>
       </ul>
     </aside>
 
     <section class="catalog">
-      <h1>Nuestros Productos</h1>
-
-      <div class="products-grid">
-        <div class="product-card">
-          <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400" alt="Pan Francés" class="product-img" />
-          <h2>Pan Francés</h2>
-          <p>Pan crujiente recién horneado</p>
-          <span class="product-price">Bs 1,00</span>
-          <form class="add-cart-form" onsubmit="return addToCart(event)">
-            <button type="submit" class="btn-primary">
-              <i class="fas fa-shopping-cart"></i> Agregar al Carrito
-            </button>
-          </form>
-        </div>
-
-        <div class="product-card">
-          <img src="https://images.unsplash.com/photo-1586444248902-2f64eddc13df?w=400" alt="Pan Integral" class="product-img" />
-          <h2>Pan Integral</h2>
-          <p>Saludable y nutritivo</p>
-          <span class="product-price">Bs 2,50</span>
-          <form class="add-cart-form" onsubmit="return addToCart(event)">
-            <button type="submit" class="btn-primary">
-              <i class="fas fa-shopping-cart"></i> Agregar al Carrito
-            </button>
-          </form>
-        </div>
-
-        <div class="product-card">
-          <img src="https://images.unsplash.com/photo-1608198093002-ad4e005484ec?w=400" alt="Empanadas" class="product-img" />
-          <h2>Empanadas</h2>
-          <p>Rellenas de carne o pollo</p>
-          <span class="product-price">Bs 5,00</span>
-          <form class="add-cart-form" onsubmit="return addToCart(event)">
-            <button type="submit" class="btn-primary">
-              <i class="fas fa-shopping-cart"></i> Agregar al Carrito
-            </button>
-          </form>
-        </div>
-
-        <div class="product-card">
-          <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400" alt="Torta" class="product-img" />
-          <h2>Torta Especial</h2>
-          <p>Para toda ocasión</p>
-          <span class="product-price">Bs 80,00</span>
-          <form class="add-cart-form" onsubmit="return addToCart(event)">
-            <button type="submit" class="btn-primary">
-              <i class="fas fa-shopping-cart"></i> Agregar al Carrito
-            </button>
-          </form>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <h1 style="margin: 0;">Nuestros Productos</h1>
+        
+        <!-- Buscador -->
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Buscar productos por nombre o código..." 
+            onkeyup="buscarProductos()"
+          />
+          <button id="clearSearch" onclick="limpiarBusqueda()" style="display: none;">
+            <i class="fas fa-times"></i>
+          </button>
         </div>
       </div>
+
+      <!-- Filtros activos y resultados -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div id="activeFilters" class="active-filters" style="display: none;"></div>
+        <div id="searchResults" class="search-results" style="display: none;"></div>
+      </div>
+
+      <!-- Grid de productos -->
+      <div id="productsGrid" class="products-grid">
+        <!-- Productos dinámicos se cargarán aquí -->
+        <div class="loading">
+          <i class="fas fa-spinner"></i>
+          <p>Cargando productos...</p>
+        </div>
+      </div>
+
+      <!-- Paginación -->
+      <div id="pagination" class="pagination" style="display: none;"></div>
     </section>
   </main>
 
+  <!-- Modal Ubicación -->
+  <div id="modalUbicacion" class="modal">
+    <div class="modal-content modal-ubicacion-content">
+      <span class="close" onclick="closeUbicacionModal()">&times;</span>
+      
+      <div class="map-header">
+        <i class="fas fa-map-marked-alt"></i>
+        Nuestra Ubicación - ¡Ven a Visitarnos!
+      </div>
+      
+      <div id="map"></div>
+
+      <div class="panaderia-info">
+        <div class="info-item">
+          <i class="fas fa-map-marker-alt"></i>
+          <div>
+            <strong>Dirección</strong>
+            <span>Montero, Santa Cruz - Bolivia</span>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <i class="fas fa-clock"></i>
+          <div>
+            <strong>Horario</strong>
+            <span>Lun - Dom: 6:00 AM - 8:00 PM</span>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <i class="fas fa-phone-alt"></i>
+          <div>
+            <strong>Teléfono</strong>
+            <span>+591 123 456 789</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Crear Cuenta -->
   <div id="modalCrearCuenta" class="modal">
     <div class="modal-content">
       <span class="close" onclick="closeModal()">&times;</span>
@@ -196,6 +488,40 @@
     </div>
   </div>
 
+  <!-- Modal Login -->
+  <div id="modalLogin" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeLoginModal()">&times;</span>
+      <h3><i class="fas fa-sign-in-alt"></i> Iniciar Sesión</h3>
+      <form id="formLogin" onsubmit="return handleLogin(event)">
+        <label>Correo Electrónico:</label>
+        <input type="email" name="email" placeholder="tu@email.com" required>
+        
+        <label>Contraseña:</label>
+        <input type="password" name="password" placeholder="••••••••" required>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin: 10px 0;">
+          <label style="display: flex; align-items: center; gap: 5px; font-size: 0.9em;">
+            <input type="checkbox" name="remember">
+            <span>Recordarme</span>
+          </label>
+          <a href="#" style="font-size: 0.9em; color: var(--primary-color);">¿Olvidaste tu contraseña?</a>
+        </div>
+        
+        <button type="submit" class="btn-primary" style="margin-top: 15px;">
+          <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+        </button>
+        
+        <p style="text-align: center; margin-top: 15px; font-size: 0.9em;">
+          ¿No tienes cuenta? 
+          <a href="#" onclick="switchToRegister(event)" style="color: var(--primary-color); font-weight: 600;">Regístrate aquí</a>
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
   <script src="../js/catalogo.js"></script>
 </body>
 </html>

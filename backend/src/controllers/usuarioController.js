@@ -1,5 +1,5 @@
+const UsuarioModel = require('../models/usuarioModel');
 const pool = require('../config/database');
-const bcrypt = require('bcrypt');
 const { validatePassword } = require('../utils/passwordValidator');
 
 // Listar todos los usuarios
@@ -7,58 +7,16 @@ const getAll = async (req, res) => {
   try {
     const { estado, buscar } = req.query;
     
-    let query = `
-      SELECT 
-        u.id_usuario,
-        u.nombre,
-        u.email,
-        u.estado,
-        u.intentos_fallidos,
-        u.bloqueado,
-        u.ultimo_acceso,
-        u.fecha_creacion,
-        COALESCE(
-          json_agg(
-            DISTINCT jsonb_build_object('id_rol', r.id_rol, 'nombre', r.nombre)
-          ) FILTER (WHERE r.id_rol IS NOT NULL), 
-          '[]'
-        ) as roles,
-        COALESCE(
-          json_agg(
-            DISTINCT jsonb_build_object('id_permiso', p.id_permiso, 'nombre', p.nombre)
-          ) FILTER (WHERE p.id_permiso IS NOT NULL),
-          '[]'
-        ) as permisos
-      FROM usuarios u
-      LEFT JOIN usuarios_roles_permisos urp ON u.id_usuario = urp.id_usuario
-      LEFT JOIN roles r ON urp.id_rol = r.id_rol
-      LEFT JOIN permisos p ON urp.id_permiso = p.id_permiso
-      WHERE 1=1
-    `;
+    const filtros = {};
+    if (estado !== undefined) filtros.estado = estado === 'true';
+    if (buscar) filtros.buscar = buscar;
 
-    const params = [];
-    let paramIndex = 1;
-
-    if (estado !== undefined) {
-      query += ` AND u.estado = $${paramIndex}`;
-      params.push(estado === 'true');
-      paramIndex++;
-    }
-
-    if (buscar) {
-      query += ` AND (u.nombre ILIKE $${paramIndex} OR u.email ILIKE $${paramIndex})`;
-      params.push(`%${buscar}%`);
-      paramIndex++;
-    }
-
-    query += ` GROUP BY u.id_usuario ORDER BY u.nombre ASC`;
-
-    const result = await pool.query(query, params);
+    const usuarios = await UsuarioModel.getAll(filtros);
 
     res.json({
       success: true,
-      count: result.rows.length,
-      usuarios: result.rows
+      count: usuarios.length,
+      data: usuarios
     });
 
   } catch (error) {
@@ -75,40 +33,9 @@ const getAll = async (req, res) => {
 const getById = async (req, res) => {
   try {
     const { id } = req.params;
+    const usuario = await UsuarioModel.getById(id);
 
-    const query = `
-      SELECT 
-        u.id_usuario,
-        u.nombre,
-        u.email,
-        u.estado,
-        u.intentos_fallidos,
-        u.bloqueado,
-        u.ultimo_acceso,
-        u.fecha_creacion,
-        COALESCE(
-          json_agg(
-            DISTINCT jsonb_build_object('id_rol', r.id_rol, 'nombre', r.nombre)
-          ) FILTER (WHERE r.id_rol IS NOT NULL),
-          '[]'
-        ) as roles,
-        COALESCE(
-          json_agg(
-            DISTINCT jsonb_build_object('id_permiso', p.id_permiso, 'nombre', p.nombre)
-          ) FILTER (WHERE p.id_permiso IS NOT NULL),
-          '[]'
-        ) as permisos
-      FROM usuarios u
-      LEFT JOIN usuarios_roles_permisos urp ON u.id_usuario = urp.id_usuario
-      LEFT JOIN roles r ON urp.id_rol = r.id_rol
-      LEFT JOIN permisos p ON urp.id_permiso = p.id_permiso
-      WHERE u.id_usuario = $1
-      GROUP BY u.id_usuario
-    `;
-
-    const result = await pool.query(query, [id]);
-
-    if (result.rows.length === 0) {
+    if (!usuario) {
       return res.status(404).json({
         success: false,
         message: 'Usuario no encontrado'
@@ -117,7 +44,7 @@ const getById = async (req, res) => {
 
     res.json({
       success: true,
-      usuario: result.rows[0]
+      data: usuario
     });
 
   } catch (error) {
@@ -164,68 +91,29 @@ const create = async (req, res) => {
       });
     }
 
-    await client.query('BEGIN');
-
     // Verificar si email existe
-    const userExists = await client.query(
-      'SELECT id_usuario FROM usuarios WHERE email = $1',
-      [email]
-    );
-
-    if (userExists.rows.length > 0) {
-      await client.query('ROLLBACK');
+    const userExists = await UsuarioModel.getByEmail(email);
+    if (userExists) {
       return res.status(400).json({
         success: false,
         message: 'El email ya está registrado'
       });
     }
 
-    // Encriptar contraseña
-    const hashedPassword = await bcrypt.hash(password, parseInt(process.env.BCRYPT_ROUNDS));
+    await client.query('BEGIN');
 
-    // Insertar usuario
-    const userResult = await client.query(
-      'INSERT INTO usuarios (nombre, email, password, estado) VALUES ($1, $2, $3, $4) RETURNING id_usuario, nombre, email, estado',
-      [nombre, email, hashedPassword, estado !== undefined ? estado : true]
-    );
-
-    const usuario = userResult.rows[0];
+    // Crear usuario
+    const usuario = await UsuarioModel.create({ nombre, email, password, estado });
 
     // Asignar roles y permisos
-    if (roles && roles.length > 0) {
-      for (const id_rol of roles) {
-        // Obtener permisos del rol
-        const rolesPermisos = await client.query(
-          'SELECT id_permiso FROM roles_permisos WHERE id_rol = $1',
-          [id_rol]
-        );
-
-        // Insertar usuario-rol-permisos
-        for (const rp of rolesPermisos.rows) {
-          await client.query(
-            'INSERT INTO usuarios_roles_permisos (id_usuario, id_rol, id_permiso) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING',
-            [usuario.id_usuario, id_rol, rp.id_permiso]
-          );
-        }
-      }
-    }
-
-    // Asignar permisos adicionales
-    if (permisos && permisos.length > 0) {
-      for (const id_permiso of permisos) {
-        await client.query(
-          'INSERT INTO usuarios_roles_permisos (id_usuario, id_permiso) VALUES ($1, $2) ON CONFLICT DO NOTHING',
-          [usuario.id_usuario, id_permiso]
-        );
-      }
-    }
+    await UsuarioModel.assignRolesAndPermissions(client, usuario.id_usuario, roles, permisos);
 
     await client.query('COMMIT');
 
     res.status(201).json({
       success: true,
       message: 'Usuario creado exitosamente',
-      usuario
+      data: usuario
     });
 
   } catch (error) {
@@ -249,16 +137,9 @@ const update = async (req, res) => {
     const { id } = req.params;
     const { nombre, email, password, roles, permisos, estado } = req.body;
 
-    await client.query('BEGIN');
-
     // Verificar que usuario existe
-    const userCheck = await client.query(
-      'SELECT id_usuario FROM usuarios WHERE id_usuario = $1',
-      [id]
-    );
-
-    if (userCheck.rows.length === 0) {
-      await client.query('ROLLBACK');
+    const userCheck = await UsuarioModel.getById(id);
+    if (!userCheck) {
       return res.status(404).json({
         success: false,
         message: 'Usuario no encontrado'
@@ -266,14 +147,9 @@ const update = async (req, res) => {
     }
 
     // Verificar email único
-    if (email) {
-      const emailCheck = await client.query(
-        'SELECT id_usuario FROM usuarios WHERE email = $1 AND id_usuario != $2',
-        [email, id]
-      );
-
-      if (emailCheck.rows.length > 0) {
-        await client.query('ROLLBACK');
+    if (email && email !== userCheck.email) {
+      const emailCheck = await UsuarioModel.getByEmail(email);
+      if (emailCheck) {
         return res.status(400).json({
           success: false,
           message: 'El email ya está registrado'
@@ -281,92 +157,34 @@ const update = async (req, res) => {
       }
     }
 
-    // Construir query de actualización
-    const updates = [];
-    const values = [];
-    let paramIndex = 1;
-
-    if (nombre) {
-      updates.push(`nombre = $${paramIndex}`);
-      values.push(nombre);
-      paramIndex++;
-    }
-
-    if (email) {
-      updates.push(`email = $${paramIndex}`);
-      values.push(email);
-      paramIndex++;
-    }
-
+    // Validar contraseña si se proporciona
     if (password) {
       const passwordValidation = validatePassword(password);
       if (!passwordValidation.isValid) {
-        await client.query('ROLLBACK');
         return res.status(400).json({
           success: false,
           message: 'Contraseña no cumple requisitos',
           errors: passwordValidation.errors
         });
       }
-      
-      const hashedPassword = await bcrypt.hash(password, parseInt(process.env.BCRYPT_ROUNDS));
-      updates.push(`password = $${paramIndex}`);
-      values.push(hashedPassword);
-      paramIndex++;
     }
 
-    if (estado !== undefined) {
-      updates.push(`estado = $${paramIndex}`);
-      values.push(estado);
-      paramIndex++;
-    }
+    await client.query('BEGIN');
 
-    updates.push(`fecha_actualizacion = CURRENT_TIMESTAMP`);
-    values.push(id);
-
-    if (updates.length > 0) {
-      const query = `UPDATE usuarios SET ${updates.join(', ')} WHERE id_usuario = $${paramIndex} RETURNING id_usuario, nombre, email, estado`;
-      await client.query(query, values);
-    }
+    // Actualizar usuario
+    const usuarioActualizado = await UsuarioModel.update(id, { nombre, email, password, estado });
 
     // Actualizar roles y permisos si se proporcionan
     if (roles !== undefined) {
-      // Eliminar asignaciones anteriores
-      await client.query('DELETE FROM usuarios_roles_permisos WHERE id_usuario = $1', [id]);
-
-      // Insertar nuevos roles y sus permisos
-      if (roles.length > 0) {
-        for (const id_rol of roles) {
-          const rolesPermisos = await client.query(
-            'SELECT id_permiso FROM roles_permisos WHERE id_rol = $1',
-            [id_rol]
-          );
-
-          for (const rp of rolesPermisos.rows) {
-            await client.query(
-              'INSERT INTO usuarios_roles_permisos (id_usuario, id_rol, id_permiso) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING',
-              [id, id_rol, rp.id_permiso]
-            );
-          }
-        }
-      }
-
-      // Agregar permisos adicionales
-      if (permisos && permisos.length > 0) {
-        for (const id_permiso of permisos) {
-          await client.query(
-            'INSERT INTO usuarios_roles_permisos (id_usuario, id_permiso) VALUES ($1, $2) ON CONFLICT DO NOTHING',
-            [id, id_permiso]
-          );
-        }
-      }
+      await UsuarioModel.assignRolesAndPermissions(client, id, roles, permisos);
     }
 
     await client.query('COMMIT');
 
     res.json({
       success: true,
-      message: 'Usuario actualizado exitosamente'
+      message: 'Usuario actualizado exitosamente',
+      data: usuarioActualizado
     });
 
   } catch (error) {
@@ -387,12 +205,9 @@ const deleteUsuario = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const result = await pool.query(
-      'UPDATE usuarios SET estado = false WHERE id_usuario = $1 RETURNING id_usuario',
-      [id]
-    );
+    const usuario = await UsuarioModel.delete(id);
 
-    if (result.rows.length === 0) {
+    if (!usuario) {
       return res.status(404).json({
         success: false,
         message: 'Usuario no encontrado'

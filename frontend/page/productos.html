@@ -88,7 +88,6 @@
 (async function() {
     console.log('🚀 Inicializando módulo de productos...');
     
-    // Obtener api desde window
     const api = window.api;
     
     if (!api) {
@@ -103,6 +102,8 @@
     const btnCerrar = document.getElementById('btnCerrarModal');
     const selectCategoria = document.getElementById('selectCategoria');
     const filtroCategoria = document.getElementById('filtroCategoria');
+    const filtroEstado = document.getElementById('filtroEstado');
+    const buscarProducto = document.getElementById('buscarProducto');
 
     if (!tabla || !modal || !form) {
         console.error('❌ Elementos del DOM no encontrados');
@@ -119,8 +120,6 @@
 
     // Cerrar modal
     btnCerrar.onclick = () => modal.style.display = 'none';
-    
-    // Cerrar modal al hacer click fuera
     modal.onclick = (e) => {
         if (e.target === modal) modal.style.display = 'none';
     };
@@ -131,7 +130,6 @@
             const response = await api.get('/categorias');
             console.log('📂 Respuesta categorías:', response.data);
             
-            // ✅ Acceder a response.data.data (formato del backend)
             const categorias = response.data.data || response.data;
             
             if (!Array.isArray(categorias)) {
@@ -154,14 +152,30 @@
         }
     }
 
-    // Cargar productos
+    // ✅ FUNCIÓN PARA CARGAR PRODUCTOS CON FILTROS
     async function cargarProductos() {
         try {
             console.log('📦 Cargando productos...');
-            const response = await api.get('/productos');
+            
+            // ✅ Construir query params desde los filtros
+            const params = new URLSearchParams();
+            
+            const buscar = buscarProducto.value.trim();
+            const categoria = filtroCategoria.value;
+            const estado = filtroEstado.value;
+            
+            if (buscar) params.append('buscar', buscar);
+            if (categoria) params.append('categoria', categoria);
+            if (estado) params.append('estado', estado);
+            
+            const queryString = params.toString();
+            const url = queryString ? `/productos?${queryString}` : '/productos';
+            
+            console.log('🔍 URL de búsqueda:', url);
+            
+            const response = await api.get(url);
             console.log('📦 Respuesta productos:', response.data);
             
-            // ✅ Acceder a response.data.data (formato del backend)
             const productos = response.data.data || response.data;
             
             if (!Array.isArray(productos)) {
@@ -173,7 +187,7 @@
             console.log('✅ Productos cargados:', productos.length);
             
             if (productos.length === 0) {
-                tabla.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px; color: #666;">No hay productos registrados</td></tr>';
+                tabla.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px; color: #666;">No se encontraron productos con los filtros aplicados</td></tr>';
                 return;
             }
             
@@ -221,6 +235,30 @@
         }
     }
 
+    // ✅ EVENTOS DE LOS FILTROS
+    let timeoutBusqueda;
+    
+    // Buscar con delay (debounce)
+    buscarProducto.addEventListener('input', () => {
+        clearTimeout(timeoutBusqueda);
+        timeoutBusqueda = setTimeout(() => {
+            console.log('🔍 Buscando:', buscarProducto.value);
+            cargarProductos();
+        }, 500); // Espera 500ms después de que el usuario deje de escribir
+    });
+
+    // Filtro por categoría
+    filtroCategoria.addEventListener('change', () => {
+        console.log('📂 Filtro categoría:', filtroCategoria.value);
+        cargarProductos();
+    });
+
+    // Filtro por estado
+    filtroEstado.addEventListener('change', () => {
+        console.log('🔘 Filtro estado:', filtroEstado.value);
+        cargarProductos();
+    });
+
     // Guardar producto
     form.onsubmit = async (e) => {
         e.preventDefault();
@@ -228,21 +266,16 @@
         const formData = new FormData(form);
         const data = Object.fromEntries(formData);
         
-        // Convertir estado a boolean
         data.estado = data.estado === 'true';
-        
-        // Convertir precio a número
         data.precio_venta = parseFloat(data.precio_venta);
 
         try {
             const idProducto = data.id_producto;
             
             if (idProducto) {
-                // Actualizar
                 await api.put(`/productos/${idProducto}`, data);
                 alert('✅ Producto actualizado correctamente');
             } else {
-                // Crear nuevo
                 delete data.id_producto;
                 await api.post('/productos', data);
                 alert('✅ Producto creado correctamente');

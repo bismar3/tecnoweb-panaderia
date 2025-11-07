@@ -1,0 +1,659 @@
+<!-- compras.html - SIN <html>, <head>, solo contenido -->
+<div class="compras-container" style="padding: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h1><i class="fas fa-file-invoice-dollar"></i> Gestión de Compras</h1>
+        <button id="btnNuevaCompra" style="background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+            <i class="fas fa-plus"></i> Nueva Compra
+        </button>
+    </div>
+
+    <!-- Filtros -->
+    <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+            <select id="filtroProveedor" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                <option value="">Todos los proveedores</option>
+            </select>
+            <select id="filtroEstado" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                <option value="">Todos los estados</option>
+                <option value="pendiente">Pendiente</option>
+                <option value="recibido">Recibido</option>
+                <option value="cancelado">Cancelado</option>
+            </select>
+            <input type="date" id="filtroFechaDesde" placeholder="Fecha desde" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+            <input type="date" id="filtroFechaHasta" placeholder="Fecha hasta" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+        </div>
+    </div>
+
+    <!-- Tabla -->
+    <div style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <div style="overflow-x: auto;">
+            <table id="tablaCompras" style="width: 100%; border-collapse: collapse; min-width: 900px;">
+                <thead style="background: #f3f4f6;">
+                    <tr>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">N° Compra</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Fecha</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Proveedor</th>
+                        <th style="padding: 12px; text-align: right; border-bottom: 2px solid #e5e7eb;">Total</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Estado</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Usuario</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal Nueva/Editar Compra -->
+    <div id="modalCompra" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; overflow-y: auto;">
+        <div style="background: white; padding: 30px; border-radius: 10px; width: 95%; max-width: 1000px; max-height: 90vh; overflow-y: auto; margin: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 id="modalTitle">Nueva Compra</h2>
+                <button id="btnCerrarModal" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #666;">&times;</button>
+            </div>
+            
+            <form id="formCompra">
+                <input type="hidden" name="id_compra">
+                
+                <!-- Datos generales -->
+                <div style="background: #f9fafb; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="margin: 0 0 15px 0; color: #374151;">Información General</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                        <div>
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Proveedor:</label>
+                            <select name="id_proveedor" id="selectProveedor" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                                <option value="">Sin proveedor (Compra directa)</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Almacén Destino: <span style="color: red;">*</span></label>
+                            <select name="id_almacen" id="selectAlmacen" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                                <option value="">Seleccionar almacén</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Estado:</label>
+                            <select name="estado" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                                <option value="pendiente">Pendiente</option>
+                                <option value="recibido">Recibido</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Productos -->
+                <div style="background: #f9fafb; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 style="margin: 0; color: #374151;">Productos</h3>
+                        <button type="button" id="btnAgregarProducto" style="background: #10b981; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;">
+                            <i class="fas fa-plus"></i> Agregar Producto
+                        </button>
+                    </div>
+                    
+                    <div style="overflow-x: auto;">
+                        <table id="tablaDetalles" style="width: 100%; border-collapse: collapse; min-width: 700px;">
+                            <thead style="background: #e5e7eb;">
+                                <tr>
+                                    <th style="padding: 10px; text-align: left; border: 1px solid #d1d5db;">Producto</th>
+                                    <th style="padding: 10px; text-align: center; border: 1px solid #d1d5db; width: 120px;">Cantidad</th>
+                                    <th style="padding: 10px; text-align: right; border: 1px solid #d1d5db; width: 150px;">Costo Unitario</th>
+                                    <th style="padding: 10px; text-align: right; border: 1px solid #d1d5db; width: 150px;">Subtotal</th>
+                                    <th style="padding: 10px; text-align: center; border: 1px solid #d1d5db; width: 80px;">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="detallesBody"></tbody>
+                        </table>
+                    </div>
+                    
+                    <div id="mensajeProductos" style="text-align: center; padding: 30px; color: #9ca3af; display: none;">
+                        <i class="fas fa-box-open" style="font-size: 3rem; margin-bottom: 10px; opacity: 0.5;"></i>
+                        <p>No hay productos agregados. Haz clic en "Agregar Producto"</p>
+                    </div>
+                </div>
+
+                <!-- Totales -->
+                <div style="background: #f9fafb; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <div style="display: grid; grid-template-columns: 1fr 300px; gap: 20px; align-items: start;">
+                        <div>
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Observaciones:</label>
+                            <textarea name="observaciones" rows="4" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;"></textarea>
+                        </div>
+                        
+                        <div>
+                            <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                    <span>Subtotal:</span>
+                                    <strong id="subtotalDisplay">Bs. 0.00</strong>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                    <label>Impuestos:</label>
+                                    <input type="number" name="impuestos" id="impuestosInput" step="0.01" min="0" value="0" style="width: 120px; padding: 5px; border: 1px solid #ddd; border-radius: 5px; text-align: right;">
+                                </div>
+                                <div style="border-top: 2px solid #e5e7eb; padding-top: 10px; margin-top: 10px;">
+                                    <div style="display: flex; justify-content: space-between; font-size: 1.2rem;">
+                                        <strong>Total:</strong>
+                                        <strong id="totalDisplay" style="color: #3b82f6;">Bs. 0.00</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" style="width: 100%; background: #10b981; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: 600;">
+                    <i class="fas fa-save"></i> Guardar Compra
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Ver Detalle -->
+    <div id="modalDetalle" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;">
+        <div style="background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 900px; max-height: 90vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2><i class="fas fa-file-invoice"></i> Detalle de Compra</h2>
+                <button id="btnCerrarDetalle" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #666;">&times;</button>
+            </div>
+            <div id="contenidoDetalle"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+(async function() {
+    console.log('🚀 Inicializando módulo de compras...');
+    
+    const api = window.api;
+    
+    if (!api) {
+        console.error('❌ API no está disponible');
+        return;
+    }
+    
+    // ⭐ AGREGAR ESTO AQUÍ ⭐
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    if (token) {
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        console.log('🔑 Token configurado manualmente');
+    } else {
+        alert('⚠️ No hay sesión activa');
+        window.location.href = '/frontend/page/login.html';
+        return;
+    }
+    
+    const tabla = document.querySelector('#tablaCompras tbody');
+    const modal = document.getElementById('modalCompra');
+    const modalDetalle = document.getElementById('modalDetalle');
+    const form = document.getElementById('formCompra');
+    const btnNueva = document.getElementById('btnNuevaCompra');
+    const btnCerrar = document.getElementById('btnCerrarModal');
+    const btnCerrarDetalle = document.getElementById('btnCerrarDetalle');
+    const detallesBody = document.getElementById('detallesBody');
+    const btnAgregarProducto = document.getElementById('btnAgregarProducto');
+    const mensajeProductos = document.getElementById('mensajeProductos');
+    const impuestosInput = document.getElementById('impuestosInput');
+
+    let detallesCompra = [];
+    let productos = [];
+    let proveedores = [];
+    let almacenes = [];
+
+    // ============================================
+    // MODAL - ABRIR/CERRAR
+    // ============================================
+    
+    btnNueva.onclick = () => {
+        form.reset();
+        detallesCompra = [];
+        renderizarDetalles();
+        calcularTotales();
+        document.getElementById('modalTitle').textContent = 'Nueva Compra';
+        modal.style.display = 'flex';
+    };
+
+    btnCerrar.onclick = () => modal.style.display = 'none';
+    modal.onclick = (e) => {
+        if (e.target === modal) modal.style.display = 'none';
+    };
+
+    btnCerrarDetalle.onclick = () => modalDetalle.style.display = 'none';
+    modalDetalle.onclick = (e) => {
+        if (e.target === modalDetalle) modalDetalle.style.display = 'none';
+    };
+
+    // ============================================
+    // CARGAR DATOS INICIALES
+    // ============================================
+    
+    async function cargarDatosIniciales() {
+        try {
+            const [prodRes, provRes, almRes] = await Promise.all([
+                api.get('/productos?estado=true'),
+                api.get('/proveedores?estado=true'),
+                api.get('/almacenes?estado=true')
+            ]);
+
+            productos = prodRes.data.data || prodRes.data;
+            proveedores = provRes.data.data || provRes.data;
+            almacenes = almRes.data.data || almRes.data;
+
+            const selectProveedor = document.getElementById('selectProveedor');
+            const filtroProveedor = document.getElementById('filtroProveedor');
+            const optionsProveedor = proveedores.map(p => 
+                `<option value="${p.id_proveedor}">${p.nombre}</option>`
+            ).join('');
+            selectProveedor.innerHTML += optionsProveedor;
+            filtroProveedor.innerHTML += optionsProveedor;
+
+            const selectAlmacen = document.getElementById('selectAlmacen');
+            selectAlmacen.innerHTML += almacenes.map(a => 
+                `<option value="${a.id_almacen}">${a.nombre}</option>`
+            ).join('');
+
+            console.log('✅ Datos iniciales cargados');
+        } catch (error) {
+            console.error('❌ Error cargando datos:', error);
+        }
+    }
+
+    // ============================================
+    // GESTIÓN DE DETALLES (PRODUCTOS)
+    // ============================================
+    
+    btnAgregarProducto.onclick = () => {
+        const fila = {
+            id_producto: '',
+            cantidad: 1,
+            costo_unitario: 0
+        };
+        detallesCompra.push(fila);
+        renderizarDetalles();
+    };
+
+    function renderizarDetalles() {
+        if (detallesCompra.length === 0) {
+            detallesBody.innerHTML = '';
+            mensajeProductos.style.display = 'block';
+            return;
+        }
+
+        mensajeProductos.style.display = 'none';
+        
+        detallesBody.innerHTML = detallesCompra.map((detalle, index) => {
+            const producto = productos.find(p => p.id_producto == detalle.id_producto);
+            const subtotal = (detalle.cantidad || 0) * (detalle.costo_unitario || 0);
+            
+            return `
+                <tr>
+                    <td style="padding: 8px; border: 1px solid #d1d5db;">
+                        <select class="producto-select" data-index="${index}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            <option value="">Seleccionar producto</option>
+                            ${productos.map(p => 
+                                `<option value="${p.id_producto}" ${p.id_producto == detalle.id_producto ? 'selected' : ''}>
+                                    ${p.codigo} - ${p.nombre} (${p.unidad_medida})
+                                </option>`
+                            ).join('')}
+                        </select>
+                    </td>
+                    <td style="padding: 8px; border: 1px solid #d1d5db;">
+                        <input type="number" class="cantidad-input" data-index="${index}" value="${detalle.cantidad}" min="0.01" step="0.01" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; text-align: center;">
+                    </td>
+                    <td style="padding: 8px; border: 1px solid #d1d5db;">
+                        <input type="number" class="costo-input" data-index="${index}" value="${detalle.costo_unitario}" min="0" step="0.01" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; text-align: right;">
+                    </td>
+                    <td style="padding: 8px; border: 1px solid #d1d5db; text-align: right; font-weight: 600;">
+                        Bs. ${subtotal.toFixed(2)}
+                    </td>
+                    <td style="padding: 8px; border: 1px solid #d1d5db; text-align: center;">
+                        <button type="button" class="btn-eliminar-detalle" data-index="${index}" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+        // Event listeners
+        document.querySelectorAll('.producto-select').forEach(select => {
+            select.onchange = function() {
+                const index = this.dataset.index;
+                detallesCompra[index].id_producto = this.value;
+                calcularTotales();
+            };
+        });
+
+        document.querySelectorAll('.cantidad-input').forEach(input => {
+            input.oninput = function() {
+                const index = this.dataset.index;
+                detallesCompra[index].cantidad = parseFloat(this.value) || 0;
+                calcularTotales();
+                renderizarDetalles();
+            };
+        });
+
+        document.querySelectorAll('.costo-input').forEach(input => {
+            input.oninput = function() {
+                const index = this.dataset.index;
+                detallesCompra[index].costo_unitario = parseFloat(this.value) || 0;
+                calcularTotales();
+                renderizarDetalles();
+            };
+        });
+
+        document.querySelectorAll('.btn-eliminar-detalle').forEach(btn => {
+            btn.onclick = function() {
+                const index = parseInt(this.dataset.index);
+                detallesCompra.splice(index, 1);
+                renderizarDetalles();
+                calcularTotales();
+            };
+        });
+    }
+
+    function calcularTotales() {
+        const subtotal = detallesCompra.reduce((sum, d) => {
+            return sum + ((d.cantidad || 0) * (d.costo_unitario || 0));
+        }, 0);
+
+        const impuestos = parseFloat(impuestosInput.value) || 0;
+        const total = subtotal + impuestos;
+
+        document.getElementById('subtotalDisplay').textContent = `Bs. ${subtotal.toFixed(2)}`;
+        document.getElementById('totalDisplay').textContent = `Bs. ${total.toFixed(2)}`;
+    }
+
+    impuestosInput.oninput = calcularTotales;
+
+    // ============================================
+    // CARGAR COMPRAS
+    // ============================================
+    
+    async function cargarCompras() {
+        try {
+            const params = new URLSearchParams();
+            
+            const proveedor = document.getElementById('filtroProveedor').value;
+            const estado = document.getElementById('filtroEstado').value;
+            const fechaDesde = document.getElementById('filtroFechaDesde').value;
+            const fechaHasta = document.getElementById('filtroFechaHasta').value;
+            
+            if (proveedor) params.append('id_proveedor', proveedor);
+            if (estado) params.append('estado', estado);
+            if (fechaDesde) params.append('fecha_desde', fechaDesde);
+            if (fechaHasta) params.append('fecha_hasta', fechaHasta);
+            
+            const queryString = params.toString();
+            const url = queryString ? `/compras?${queryString}` : '/compras';
+            
+            const response = await api.get(url);
+            const compras = response.data.data || response.data;
+            
+            if (compras.length === 0) {
+                tabla.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px; color: #666;">No se encontraron compras</td></tr>';
+                return;
+            }
+            
+            tabla.innerHTML = compras.map(c => {
+                const estadoColor = {
+                    'pendiente': '#f59e0b',
+                    'recibido': '#10b981',
+                    'cancelado': '#ef4444'
+                };
+                
+                return `
+                    <tr>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; font-weight: 600;">${c.numero_compra}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${new Date(c.fecha_compra).toLocaleDateString('es-ES')}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${c.proveedor_nombre || 'Compra directa'}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: right; font-weight: 600; color: #10b981;">Bs. ${parseFloat(c.total).toFixed(2)}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
+                            <span style="background: ${estadoColor[c.estado]}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; text-transform: capitalize;">
+                                ${c.estado}
+                            </span>
+                        </td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${c.usuario_nombre || 'N/A'}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
+                            <button class="btn-ver" data-id="${c.id_compra}" style="background: #8b5cf6; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 5px;" title="Ver detalle">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            ${c.estado === 'pendiente' ? `
+                                <button class="btn-recibir" data-id="${c.id_compra}" style="background: #10b981; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 5px;" title="Marcar como recibido">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button class="btn-cancelar" data-id="${c.id_compra}" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;" title="Cancelar">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            ` : ''}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            tabla.querySelectorAll('.btn-ver').forEach(btn => {
+                btn.onclick = () => verDetalle(btn.dataset.id);
+            });
+            tabla.querySelectorAll('.btn-recibir').forEach(btn => {
+                btn.onclick = () => cambiarEstado(btn.dataset.id, 'recibido');
+            });
+            tabla.querySelectorAll('.btn-cancelar').forEach(btn => {
+                btn.onclick = () => cancelarCompra(btn.dataset.id);
+            });
+
+        } catch (error) {
+            console.error('❌ Error al cargar compras:', error);
+            tabla.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 20px; color: red;">Error al cargar compras</td></tr>`;
+        }
+    }
+
+    // ============================================
+    // EVENTOS DE FILTROS
+    // ============================================
+    
+    document.getElementById('filtroProveedor').addEventListener('change', cargarCompras);
+    document.getElementById('filtroEstado').addEventListener('change', cargarCompras);
+    document.getElementById('filtroFechaDesde').addEventListener('change', cargarCompras);
+    document.getElementById('filtroFechaHasta').addEventListener('change', cargarCompras);
+
+    // ============================================
+    // GUARDAR COMPRA
+    // ============================================
+// ============================================
+// GUARDAR COMPRA - VERSIÓN CORREGIDA
+// ============================================
+
+form.onsubmit = async (e) => {
+    e.preventDefault();
+    
+    if (detallesCompra.length === 0) {
+        alert('❌ Debe agregar al menos un producto');
+        return;
+    }
+
+    const invalidos = detallesCompra.filter(d => !d.id_producto || d.cantidad <= 0 || d.costo_unitario <= 0);
+    if (invalidos.length > 0) {
+        alert('❌ Todos los productos deben tener producto, cantidad y costo válidos');
+        return;
+    }
+
+    const formData = new FormData(form);
+    
+    // 🔧 CORRECCIÓN: Convertir string vacío a null para id_proveedor
+    const idProveedor = formData.get('id_proveedor');
+    const idAlmacen = formData.get('id_almacen');
+    
+    // Validar que el almacén esté seleccionado
+    if (!idAlmacen || idAlmacen === '') {
+        alert('❌ Debe seleccionar un almacén destino');
+        return;
+    }
+    
+    const data = {
+        // Si id_proveedor está vacío o es null, enviamos null
+        id_proveedor: (idProveedor && idProveedor !== '') ? parseInt(idProveedor) : null,
+        id_almacen: parseInt(idAlmacen),
+        impuestos: parseFloat(formData.get('impuestos')) || 0,
+        observaciones: formData.get('observaciones') || null,
+        estado: formData.get('estado'),
+        detalles: detallesCompra.map(d => ({
+            id_producto: parseInt(d.id_producto),
+            cantidad: parseFloat(d.cantidad),
+            costo_unitario: parseFloat(d.costo_unitario)
+        }))
+    };
+
+    console.log('📤 Datos a enviar:', data);
+
+    try {
+        const response = await api.post('/compras', data);
+        console.log('✅ Respuesta del servidor:', response.data);
+        alert('✅ Compra registrada correctamente. Inventario actualizado.');
+        modal.style.display = 'none';
+        form.reset();
+        detallesCompra = [];
+        cargarCompras();
+    } catch (error) {
+        console.error('❌ Error completo:', error);
+        console.error('❌ Respuesta del servidor:', error.response?.data);
+        alert('❌ Error al guardar compra: ' + (error.response?.data?.message || error.message));
+    }
+};
+    // ============================================
+    // VER DETALLE
+    // ============================================
+    
+    async function verDetalle(id) {
+        try {
+            const response = await api.get(`/compras/${id}`);
+            const compra = response.data.data || response.data;
+            
+            const contenido = document.getElementById('contenidoDetalle');
+            contenido.innerHTML = `
+                <div style="background: #f9fafb; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <div>
+                            <strong>N° Compra:</strong><br>${compra.numero_compra}
+                        </div>
+                        <div>
+                            <strong>Fecha:</strong><br>${new Date(compra.fecha_compra).toLocaleDateString('es-ES')}
+                        </div>
+                        <div>
+                            <strong>Proveedor:</strong><br>${compra.proveedor_nombre || 'Compra directa'}
+                        </div>
+                        <div>
+                            <strong>Estado:</strong><br>
+                            <span style="background: ${compra.estado === 'recibido' ? '#10b981' : compra.estado === 'cancelado' ? '#ef4444' : '#f59e0b'}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
+                                ${compra.estado}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Productos</h3>
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                    <thead style="background: #f3f4f6;">
+                        <tr>
+                            <th style="padding: 10px; text-align: left; border: 1px solid #e5e7eb;">Producto</th>
+                            <th style="padding: 10px; text-align: center; border: 1px solid #e5e7eb;">Cantidad</th>
+                            <th style="padding: 10px; text-align: right; border: 1px solid #e5e7eb;">Costo Unit.</th>
+                            <th style="padding: 10px; text-align: right; border: 1px solid #e5e7eb;">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${compra.detalles.map(d => `
+                            <tr>
+                                <td style="padding: 10px; border: 1px solid #e5e7eb;">${d.producto_codigo} - ${d.producto_nombre}</td>
+                                <td style="padding: 10px; text-align: center; border: 1px solid #e5e7eb;">${d.cantidad} ${d.unidad_medida}</td>
+                                <td style="padding: 10px; text-align: right; border: 1px solid #e5e7eb;">Bs. ${parseFloat(d.costo_unitario).toFixed(2)}</td>
+                                <td style="padding: 10px; text-align: right; border: 1px solid #e5e7eb; font-weight: 600;">Bs. ${parseFloat(d.subtotal).toFixed(2)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+
+                <div style="background: #f9fafb; padding: 15px; border-radius: 8px;">
+                    <div style="display: flex; justify-content: flex-end;">
+                        <div style="min-width: 300px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                <span>Subtotal:</span>
+                                <strong>Bs. ${parseFloat(compra.subtotal).toFixed(2)}</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                <span>Impuestos:</span>
+                                <strong>Bs. ${parseFloat(compra.impuestos).toFixed(2)}</strong>
+                            </div>
+                            <div style="border-top: 2px solid #e5e7eb; padding-top: 10px; margin-top: 10px;">
+                                <div style="display: flex; justify-content: space-between; font-size: 1.2rem;">
+                                    <strong>Total:</strong>
+                                    <strong style="color: #10b981;">Bs. ${parseFloat(compra.total).toFixed(2)}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    ${compra.observaciones ? `
+                        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e5e7eb;">
+                            <strong>Observaciones:</strong><br>
+                            <p style="margin: 5px 0;">${compra.observaciones}</p>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            modalDetalle.style.display = 'flex';
+        } catch (error) {
+            console.error('Error:', error);
+            alert('❌ Error al cargar detalle');
+        }
+    }
+
+    // ============================================
+    // CAMBIAR ESTADO
+    // ============================================
+    
+    async function cambiarEstado(id, nuevoEstado) {
+        const mensaje = nuevoEstado === 'recibido' 
+            ? '¿Marcar esta compra como recibida? El inventario ya fue actualizado al crear la compra.'
+            : '¿Cambiar el estado de esta compra?';
+            
+        if (!confirm(mensaje)) return;
+        
+        try {
+            await api.patch(`/compras/${id}/estado`, { estado: nuevoEstado });
+            alert(`✅ Estado actualizado a: ${nuevoEstado}`);
+            cargarCompras();
+        } catch (error) {
+            console.error('Error:', error);
+            alert('❌ Error al cambiar estado: ' + (error.response?.data?.message || error.message));
+        }
+    }
+
+    // ============================================
+    // CANCELAR COMPRA
+    // ============================================
+    
+    async function cancelarCompra(id) {
+        if (!confirm('¿Está seguro de cancelar esta compra?\n\nNOTA: El inventario no se revertirá automáticamente.')) {
+            return;
+        }
+        
+        try {
+            await api.delete(`/compras/${id}`);
+            alert('✅ Compra cancelada correctamente');
+            cargarCompras();
+        } catch (error) {
+            console.error('Error:', error);
+            alert('❌ Error al cancelar compra: ' + (error.response?.data?.message || error.message));
+        }
+    }
+
+    // ============================================
+    // INICIALIZAR
+    // ============================================
+    
+    await cargarDatosIniciales();
+    await cargarCompras();
+    
+    console.log('✅ Módulo de compras inicializado correctamente');
+})();
+</script>

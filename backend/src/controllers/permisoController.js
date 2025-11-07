@@ -1,44 +1,20 @@
-const pool = require('../config/database');
+const PermisoModel = require('../models/permisoModel');
 
 // Listar todos los permisos
 const getAll = async (req, res) => {
   try {
     const { estado, modulo } = req.query;
     
-    let query = `
-      SELECT 
-        id_permiso,
-        nombre,
-        descripcion,
-        estado,
-        fecha_creacion
-      FROM permisos
-      WHERE 1=1
-    `;
+    const filtros = {};
+    if (estado !== undefined) filtros.estado = estado === 'true';
+    if (modulo) filtros.modulo = modulo;
 
-    const params = [];
-    let paramIndex = 1;
-
-    if (estado !== undefined) {
-      query += ` AND estado = $${paramIndex}`;
-      params.push(estado === 'true');
-      paramIndex++;
-    }
-
-    if (modulo) {
-      query += ` AND nombre ILIKE $${paramIndex}`;
-      params.push(`%${modulo}%`);
-      paramIndex++;
-    }
-
-    query += ` ORDER BY nombre ASC`;
-
-    const result = await pool.query(query, params);
+    const permisos = await PermisoModel.getAll(filtros);
 
     res.json({
       success: true,
-      count: result.rows.length,
-      permisos: result.rows
+      count: permisos.length,
+      data : permisos 
     });
 
   } catch (error) {
@@ -55,30 +31,9 @@ const getAll = async (req, res) => {
 const getById = async (req, res) => {
   try {
     const { id } = req.params;
+    const permiso = await PermisoModel.getById(id);
 
-    const query = `
-      SELECT 
-        p.id_permiso,
-        p.nombre,
-        p.descripcion,
-        p.estado,
-        p.fecha_creacion,
-        COALESCE(
-          json_agg(
-            DISTINCT jsonb_build_object('id_rol', r.id_rol, 'nombre', r.nombre)
-          ) FILTER (WHERE r.id_rol IS NOT NULL),
-          '[]'
-        ) as roles
-      FROM permisos p
-      LEFT JOIN roles_permisos rp ON p.id_permiso = rp.id_permiso
-      LEFT JOIN roles r ON rp.id_rol = r.id_rol
-      WHERE p.id_permiso = $1
-      GROUP BY p.id_permiso
-    `;
-
-    const result = await pool.query(query, [id]);
-
-    if (result.rows.length === 0) {
+    if (!permiso) {
       return res.status(404).json({
         success: false,
         message: 'Permiso no encontrado'
@@ -87,7 +42,7 @@ const getById = async (req, res) => {
 
     res.json({
       success: true,
-      permiso: result.rows[0]
+      data: permiso
     });
 
   } catch (error) {
@@ -103,7 +58,7 @@ const getById = async (req, res) => {
 // Crear permiso
 const create = async (req, res) => {
   try {
-    const { nombre, descripcion, estado } = req.body;
+    const { nombre, descripcion, modulo, estado } = req.body;
 
     // Validaciones
     if (!nombre) {
@@ -114,28 +69,20 @@ const create = async (req, res) => {
     }
 
     // Verificar si el nombre ya existe
-    const permisoExists = await pool.query(
-      'SELECT id_permiso FROM permisos WHERE nombre = $1',
-      [nombre]
-    );
-
-    if (permisoExists.rows.length > 0) {
+    const permisoExists = await PermisoModel.getByNombre(nombre);
+    if (permisoExists) {
       return res.status(400).json({
         success: false,
         message: 'Ya existe un permiso con ese nombre'
       });
     }
 
-    // Insertar permiso
-    const result = await pool.query(
-      'INSERT INTO permisos (nombre, descripcion, estado) VALUES ($1, $2, $3) RETURNING *',
-      [nombre, descripcion || null, estado !== undefined ? estado : true]
-    );
+    const permiso = await PermisoModel.create({ nombre, descripcion, modulo, estado });
 
     res.status(201).json({
       success: true,
       message: 'Permiso creado exitosamente',
-      permiso: result.rows[0]
+      data: permiso
     });
 
   } catch (error) {
@@ -152,15 +99,11 @@ const create = async (req, res) => {
 const update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nombre, descripcion, estado } = req.body;
+    const { nombre, descripcion, modulo, estado } = req.body;
 
     // Verificar que permiso existe
-    const permisoCheck = await pool.query(
-      'SELECT id_permiso FROM permisos WHERE id_permiso = $1',
-      [id]
-    );
-
-    if (permisoCheck.rows.length === 0) {
+    const permisoCheck = await PermisoModel.getById(id);
+    if (!permisoCheck) {
       return res.status(404).json({
         success: false,
         message: 'Permiso no encontrado'
@@ -168,13 +111,9 @@ const update = async (req, res) => {
     }
 
     // Verificar nombre único
-    if (nombre) {
-      const nombreCheck = await pool.query(
-        'SELECT id_permiso FROM permisos WHERE nombre = $1 AND id_permiso != $2',
-        [nombre, id]
-      );
-
-      if (nombreCheck.rows.length > 0) {
+    if (nombre && nombre !== permisoCheck.nombre) {
+      const nombreCheck = await PermisoModel.getByNombre(nombre);
+      if (nombreCheck) {
         return res.status(400).json({
           success: false,
           message: 'Ya existe un permiso con ese nombre'
@@ -182,46 +121,13 @@ const update = async (req, res) => {
       }
     }
 
-    // Construir query de actualización
-    const updates = [];
-    const values = [];
-    let paramIndex = 1;
+    const permisoActualizado = await PermisoModel.update(id, { nombre, descripcion, modulo, estado });
 
-    if (nombre) {
-      updates.push(`nombre = $${paramIndex}`);
-      values.push(nombre);
-      paramIndex++;
-    }
-
-    if (descripcion !== undefined) {
-      updates.push(`descripcion = $${paramIndex}`);
-      values.push(descripcion);
-      paramIndex++;
-    }
-
-    if (estado !== undefined) {
-      updates.push(`estado = $${paramIndex}`);
-      values.push(estado);
-      paramIndex++;
-    }
-
-    values.push(id);
-
-    if (updates.length > 0) {
-      const query = `UPDATE permisos SET ${updates.join(', ')} WHERE id_permiso = $${paramIndex} RETURNING *`;
-      const result = await pool.query(query, values);
-
-      res.json({
-        success: true,
-        message: 'Permiso actualizado exitosamente',
-        permiso: result.rows[0]
-      });
-    } else {
-      res.json({
-        success: true,
-        message: 'No hay cambios para actualizar'
-      });
-    }
+    res.json({
+      success: true,
+      message: 'Permiso actualizado exitosamente',
+      data: permisoActualizado
+    });
 
   } catch (error) {
     console.error('Error en update permiso:', error);
@@ -239,33 +145,19 @@ const deletePermiso = async (req, res) => {
     const { id } = req.params;
 
     // Verificar que no haya roles o usuarios con este permiso
-    const rolesConPermiso = await pool.query(
-      'SELECT COUNT(*) as count FROM roles_permisos WHERE id_permiso = $1',
-      [id]
-    );
+    const hasRoles = await PermisoModel.hasRoles(id);
+    const hasUsers = await PermisoModel.hasUsers(id);
 
-    const usuariosConPermiso = await pool.query(
-      'SELECT COUNT(*) as count FROM usuarios_roles_permisos WHERE id_permiso = $1',
-      [id]
-    );
-
-    const totalAsignaciones = 
-      parseInt(rolesConPermiso.rows[0].count) + 
-      parseInt(usuariosConPermiso.rows[0].count);
-
-    if (totalAsignaciones > 0) {
+    if (hasRoles || hasUsers) {
       return res.status(400).json({
         success: false,
         message: 'No se puede eliminar el permiso porque está asignado a roles o usuarios'
       });
     }
 
-    const result = await pool.query(
-      'UPDATE permisos SET estado = false WHERE id_permiso = $1 RETURNING id_permiso',
-      [id]
-    );
+    const permiso = await PermisoModel.delete(id);
 
-    if (result.rows.length === 0) {
+    if (!permiso) {
       return res.status(404).json({
         success: false,
         message: 'Permiso no encontrado'

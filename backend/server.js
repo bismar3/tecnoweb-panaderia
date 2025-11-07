@@ -135,6 +135,9 @@ app.use('/api/promociones', promocionRoutes);
 // Rutas de categorias
 const categoriaRoutes = require('./src/routes/categoriaRoutes'); // ← AGREGAR
 app.use('/api/categorias', categoriaRoutes); // ← AGREGAR
+// Rutas de carritos
+const carritoRoutes = require('./routes/carritoRoutes');
+app.use('/api/carrito', carritoRoutes);
 
 // Manejo de rutas no encontradas (404)
 app.use((req, res) => {

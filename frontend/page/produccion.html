@@ -1,0 +1,445 @@
+<!-- produccion.html - SIN <html>, <head>, solo contenido -->
+<div class="produccion-container" style="padding: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h1><i class="fas fa-industry"></i> Órdenes de Producción</h1>
+        <button id="btnNuevaProduccion" style="background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+            <i class="fas fa-plus"></i> Nueva Orden
+        </button>
+    </div>
+
+    <!-- Filtros -->
+    <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+            <select id="filtroEstado" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                <option value="">Todos los estados</option>
+                <option value="pendiente">Pendiente</option>
+                <option value="en_proceso">En Proceso</option>
+                <option value="completado">Completado</option>
+                <option value="cancelado">Cancelado</option>
+            </select>
+            <select id="filtroAlmacen" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                <option value="">Todos los almacenes</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Tabla -->
+    <div style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <table id="tablaProducciones" style="width: 100%; border-collapse: collapse;">
+            <thead style="background: #f3f4f6;">
+                <tr>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">ID</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Receta</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Almacén</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Cantidad</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Fecha Inicio</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Estado</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <!-- Modal Crear -->
+    <div id="modalProduccion" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; overflow-y: auto;">
+        <div style="background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 700px; max-height: 90vh; overflow-y: auto; margin: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2><i class="fas fa-industry"></i> Nueva Orden de Producción</h2>
+                <button id="btnCerrarModal" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #666;">&times;</button>
+            </div>
+            
+            <form id="formProduccion">
+                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Receta:</label>
+                <select name="id_receta" id="selectReceta" required style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px;">
+                    <option value="">Seleccionar receta</option>
+                </select>
+                
+                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Almacén Destino:</label>
+                <select name="id_almacen" id="selectAlmacenModal" required style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px;">
+                    <option value="">Seleccionar almacén</option>
+                </select>
+                
+                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Cantidad a Producir:</label>
+                <input type="number" name="cantidad_producir" id="cantidadProducir" step="0.01" min="0.01" required style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+                
+                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Observaciones:</label>
+                <textarea name="observaciones" rows="3" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;"></textarea>
+                
+                <!-- Ingredientes necesarios -->
+                <div id="ingredientesInfo" style="background: #fff3e0; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: none;">
+                    <h4 style="margin: 0 0 10px 0; color: #e65100;"><i class="fas fa-list"></i> Ingredientes Necesarios</h4>
+                    <div id="listaIngredientesNecesarios"></div>
+                </div>
+                
+                <button type="submit" style="width: 100%; background: #10b981; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: 600;">
+                    <i class="fas fa-save"></i> Crear Orden de Producción
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Ver Detalles -->
+    <div id="modalDetalles" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;">
+        <div style="background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 700px; max-height: 90vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2><i class="fas fa-eye"></i> Detalles de Producción</h2>
+                <button id="btnCerrarDetalles" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #666;">&times;</button>
+            </div>
+            <div id="contenidoDetalles"></div>
+        </div>
+    </div>
+
+    <!-- Modal Completar -->
+    <div id="modalCompletar" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;">
+        <div style="background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 500px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2><i class="fas fa-check-circle"></i> Completar Producción</h2>
+                <button id="btnCerrarCompletar" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #666;">&times;</button>
+            </div>
+            <form id="formCompletar">
+                <input type="hidden" id="idProduccionCompletar">
+                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Cantidad Producida:</label>
+                <input type="number" id="cantidadProducida" step="0.01" min="0.01" required style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+                <button type="submit" style="width: 100%; background: #10b981; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: 600;">
+                    <i class="fas fa-check"></i> Confirmar Completado
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+(async function() {
+    console.log('🚀 Inicializando módulo de producción...');
+    
+    const api = window.api;
+    
+    if (!api) {
+        console.error('❌ API no está disponible');
+        return;
+    }
+    
+    const tabla = document.querySelector('#tablaProducciones tbody');
+    const modal = document.getElementById('modalProduccion');
+    const modalDetalles = document.getElementById('modalDetalles');
+    const modalCompletar = document.getElementById('modalCompletar');
+    const form = document.getElementById('formProduccion');
+    const formCompletar = document.getElementById('formCompletar');
+    const btnNueva = document.getElementById('btnNuevaProduccion');
+    const selectReceta = document.getElementById('selectReceta');
+    const selectAlmacenModal = document.getElementById('selectAlmacenModal');
+    const filtroAlmacen = document.getElementById('filtroAlmacen');
+    const filtroEstado = document.getElementById('filtroEstado');
+    const cantidadProducir = document.getElementById('cantidadProducir');
+    const ingredientesInfo = document.getElementById('ingredientesInfo');
+    const listaIngredientesNecesarios = document.getElementById('listaIngredientesNecesarios');
+
+    let recetasDisponibles = [];
+    let almacenesDisponibles = [];
+
+    // Cerrar modales
+    document.getElementById('btnCerrarModal').onclick = () => modal.style.display = 'none';
+    document.getElementById('btnCerrarDetalles').onclick = () => modalDetalles.style.display = 'none';
+    document.getElementById('btnCerrarCompletar').onclick = () => modalCompletar.style.display = 'none';
+    
+    modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
+    modalDetalles.onclick = (e) => { if (e.target === modalDetalles) modalDetalles.style.display = 'none'; };
+    modalCompletar.onclick = (e) => { if (e.target === modalCompletar) modalCompletar.style.display = 'none'; };
+
+    btnNueva.onclick = () => {
+        form.reset();
+        ingredientesInfo.style.display = 'none';
+        modal.style.display = 'flex';
+    };
+
+    // Cargar recetas y almacenes
+    async function cargarDatos() {
+        try {
+            const [recetasRes, almacenesRes] = await Promise.all([
+                api.get('/recetas?estado=true'),
+                api.get('/almacenes?estado=true')
+            ]);
+            
+            recetasDisponibles = recetasRes.data.data || recetasRes.data;
+            almacenesDisponibles = almacenesRes.data.data || almacenesRes.data;
+            
+            selectReceta.innerHTML = '<option value="">Seleccionar receta</option>' + 
+                recetasDisponibles.map(r => `<option value="${r.id_receta}">${r.nombre} (Rend: ${r.rendimiento})</option>`).join('');
+            
+            const almacenesOpts = almacenesDisponibles.map(a => `<option value="${a.id_almacen}">${a.nombre}</option>`).join('');
+            selectAlmacenModal.innerHTML = '<option value="">Seleccionar almacén</option>' + almacenesOpts;
+            filtroAlmacen.innerHTML = '<option value="">Todos los almacenes</option>' + almacenesOpts;
+            
+            console.log('✅ Datos cargados');
+        } catch (error) {
+            console.error('❌ Error cargando datos:', error);
+        }
+    }
+
+    // Calcular ingredientes al cambiar receta/cantidad/almacén
+    async function calcularIngredientes() {
+        const idReceta = selectReceta.value;
+        const idAlmacen = selectAlmacenModal.value;
+        const cantidad = parseFloat(cantidadProducir.value) || 0;
+        
+        if (!idReceta || !idAlmacen || cantidad <= 0) {
+            ingredientesInfo.style.display = 'none';
+            return;
+        }
+        
+        try {
+            const response = await api.get(`/recetas/${idReceta}`);
+            const receta = response.data.data || response.data;
+            
+            if (!receta.ingredientes || receta.ingredientes.length === 0) {
+                listaIngredientesNecesarios.innerHTML = '<p style="text-align: center; color: #999;">Sin ingredientes</p>';
+                ingredientesInfo.style.display = 'block';
+                return;
+            }
+            
+            // Obtener stock del almacén
+            const stockRes = await api.get(`/inventario?id_almacen=${idAlmacen}`);
+            const inventario = stockRes.data.data || stockRes.data;
+            
+            const html = receta.ingredientes.map(ing => {
+                const cantidadNecesaria = parseFloat(ing.cantidad) * cantidad;
+                const stockItem = inventario.find(i => i.id_producto === ing.id_producto);
+                const stockDisponible = stockItem ? parseFloat(stockItem.cantidad) : 0;
+                const suficiente = stockDisponible >= cantidadNecesaria;
+                
+                return `
+                    <div style="display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid #ffe0b2; align-items: center;">
+                        <span><i class="fas fa-circle" style="font-size: 6px; color: #ff9800;"></i> ${ing.ingrediente_nombre}</span>
+                        <div style="text-align: right;">
+                            <strong>${cantidadNecesaria.toFixed(2)} ${ing.unidad}</strong>
+                            <br>
+                            <small style="color: ${suficiente ? '#10b981' : '#ef4444'};">
+                                Stock: ${stockDisponible.toFixed(2)} ${suficiente ? '✓' : '✗'}
+                            </small>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            listaIngredientesNecesarios.innerHTML = html;
+            ingredientesInfo.style.display = 'block';
+            
+        } catch (error) {
+            console.error('Error calculando ingredientes:', error);
+        }
+    }
+
+    selectReceta.addEventListener('change', calcularIngredientes);
+    selectAlmacenModal.addEventListener('change', calcularIngredientes);
+    cantidadProducir.addEventListener('input', calcularIngredientes);
+
+    // Cargar producciones
+    async function cargarProducciones() {
+        try {
+            const params = new URLSearchParams();
+            if (filtroEstado.value) params.append('estado', filtroEstado.value);
+            if (filtroAlmacen.value) params.append('id_almacen', filtroAlmacen.value);
+            
+            const url = params.toString() ? `/producciones?${params}` : '/producciones';
+            const response = await api.get(url);
+            
+            const producciones = response.data.data || response.data;
+            
+            if (!Array.isArray(producciones) || producciones.length === 0) {
+                tabla.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px; color: #666;">No hay producciones</td></tr>';
+                return;
+            }
+            
+            tabla.innerHTML = producciones.map(p => {
+                const estadoColors = {
+                    pendiente: '#f59e0b',
+                    en_proceso: '#3b82f6',
+                    completado: '#10b981',
+                    cancelado: '#ef4444'
+                };
+                
+                return `
+                    <tr>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">#${p.id_produccion}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
+                            <strong>${p.receta_nombre}</strong>
+                            ${p.producto_nombre ? `<br><small>${p.producto_nombre}</small>` : ''}
+                        </td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${p.almacen_nombre || 'N/A'}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
+                            ${p.cantidad_producida > 0 ? `${p.cantidad_producida} / ` : ''}${p.cantidad_producir}
+                        </td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${new Date(p.fecha_inicio).toLocaleDateString()}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
+                            <span style="background: ${estadoColors[p.estado]}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
+                                ${p.estado.replace('_', ' ').toUpperCase()}
+                            </span>
+                        </td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
+                            <button class="btn-ver" data-id="${p.id_produccion}" style="background: #6366f1; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 5px;">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            ${p.estado === 'pendiente' ? `
+                                <button class="btn-iniciar" data-id="${p.id_produccion}" style="background: #3b82f6; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 5px;">
+                                    <i class="fas fa-play"></i>
+                                </button>
+                            ` : ''}
+                            ${p.estado === 'en_proceso' ? `
+                                <button class="btn-completar" data-id="${p.id_produccion}" style="background: #10b981; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 5px;">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            ` : ''}
+                            ${p.estado === 'pendiente' || p.estado === 'en_proceso' ? `
+                                <button class="btn-cancelar" data-id="${p.id_produccion}" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            ` : ''}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Event listeners
+            tabla.querySelectorAll('.btn-ver').forEach(btn => btn.onclick = () => verDetalles(btn.dataset.id));
+            tabla.querySelectorAll('.btn-iniciar').forEach(btn => btn.onclick = () => iniciarProduccion(btn.dataset.id));
+            tabla.querySelectorAll('.btn-completar').forEach(btn => btn.onclick = () => abrirCompletar(btn.dataset.id));
+            tabla.querySelectorAll('.btn-cancelar').forEach(btn => btn.onclick = () => cancelarProduccion(btn.dataset.id));
+
+        } catch (error) {
+            console.error('❌ Error cargando producciones:', error);
+            tabla.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 20px; color: red;">Error: ${error.message}</td></tr>`;
+        }
+    }
+
+    // Ver detalles
+    async function verDetalles(id) {
+        try {
+            const response = await api.get(`/producciones/${id}`);
+            const p = response.data.data || response.data;
+            
+            document.getElementById('contenidoDetalles').innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                        <div style="background: #f8f9fa; padding: 10px; border-radius: 5px;">
+                            <strong>Receta:</strong><br>${p.receta_nombre}
+                        </div>
+                        <div style="background: #f8f9fa; padding: 10px; border-radius: 5px;">
+                            <strong>Producto:</strong><br>${p.producto_nombre || 'N/A'}
+                        </div>
+                        <div style="background: #f8f9fa; padding: 10px; border-radius: 5px;">
+                            <strong>Almacén:</strong><br>${p.almacen_nombre}
+                        </div>
+                        <div style="background: #f8f9fa; padding: 10px; border-radius: 5px;">
+                            <strong>Cantidad:</strong><br>${p.cantidad_producida > 0 ? `${p.cantidad_producida} /` : ''} ${p.cantidad_producir}
+                        </div>
+                        <div style="background: #f8f9fa; padding: 10px; border-radius: 5px;">
+                            <strong>Fecha Inicio:</strong><br>${new Date(p.fecha_inicio).toLocaleString()}
+                        </div>
+                        <div style="background: #f8f9fa; padding: 10px; border-radius: 5px;">
+                            <strong>Estado:</strong><br><span style="color: ${p.estado === 'completado' ? '#10b981' : '#3b82f6'};">${p.estado.toUpperCase()}</span>
+                        </div>
+                    </div>
+                    
+                    ${p.observaciones ? `<p><strong>Observaciones:</strong> ${p.observaciones}</p>` : ''}
+                    
+                    <h4><i class="fas fa-list"></i> Ingredientes</h4>
+                    <div style="background: #fff3e0; padding: 15px; border-radius: 5px;">
+                        ${p.ingredientes && p.ingredientes.length > 0 ? p.ingredientes.map(ing => `
+                            <div style="display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid #ffe0b2;">
+                                <span>${ing.producto_nombre}</span>
+                                <strong>${ing.cantidad_requerida} ${ing.unidad}</strong>
+                            </div>
+                        `).join('') : '<p style="text-align: center; color: #999;">Sin ingredientes</p>'}
+                    </div>
+                </div>
+            `;
+            
+            modalDetalles.style.display = 'flex';
+        } catch (error) {
+            console.error('Error:', error);
+            alert('❌ Error al cargar detalles');
+        }
+    }
+
+    // Crear producción
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+        
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData);
+        data.cantidad_producir = parseFloat(data.cantidad_producir);
+        
+        try {
+            await api.post('/producciones', data);
+            alert('✅ Orden de producción creada. Stock validado correctamente.');
+            modal.style.display = 'none';
+            cargarProducciones();
+        } catch (error) {
+            console.error('Error:', error);
+            alert('❌ ' + (error.response?.data?.message || error.message));
+        }
+    };
+
+    // Iniciar producción
+    async function iniciarProduccion(id) {
+        if (!confirm('¿Iniciar producción? Esto descontará los ingredientes del inventario.')) return;
+        
+        try {
+            await api.patch(`/producciones/${id}/iniciar`);
+            alert('✅ Producción iniciada. Ingredientes descontados.');
+            cargarProducciones();
+        } catch (error) {
+            alert('❌ ' + (error.response?.data?.message || error.message));
+        }
+    }
+
+    // Abrir modal completar
+    function abrirCompletar(id) {
+        document.getElementById('idProduccionCompletar').value = id;
+        document.getElementById('cantidadProducida').value = '';
+        modalCompletar.style.display = 'flex';
+    }
+
+    // Completar producción
+    formCompletar.onsubmit = async (e) => {
+        e.preventDefault();
+        
+        const id = document.getElementById('idProduccionCompletar').value;
+        const cantidad_producida = parseFloat(document.getElementById('cantidadProducida').value);
+        
+        try {
+            await api.patch(`/producciones/${id}/completar`, { cantidad_producida });
+            alert('✅ Producción completada. Producto agregado al inventario.');
+            modalCompletar.style.display = 'none';
+            cargarProducciones();
+        } catch (error) {
+            alert('❌ ' + (error.response?.data?.message || error.message));
+        }
+    };
+
+    // Cancelar producción
+    async function cancelarProduccion(id) {
+        const motivo = prompt('Motivo de cancelación:');
+        if (!motivo) return;
+        
+        try {
+            await api.patch(`/producciones/${id}/cancelar`, { motivo });
+            alert('✅ Producción cancelada');
+            cargarProducciones();
+        } catch (error) {
+            alert('❌ ' + (error.response?.data?.message || error.message));
+        }
+    }
+
+    // Filtros
+    filtroEstado.addEventListener('change', cargarProducciones);
+    filtroAlmacen.addEventListener('change', cargarProducciones);
+
+    // Inicializar
+    await cargarDatos();
+    await cargarProducciones();
+    
+    console.log('✅ Módulo de producción inicializado');
+})();
+</script>

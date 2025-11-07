@@ -16,7 +16,6 @@ const api = axios.create({
 
 api.interceptors.request.use(
     config => {
-        // ✅ Buscar token en localStorage O sessionStorage
         const token = localStorage.getItem('token') || sessionStorage.getItem('token');
         
         if (token) {
@@ -46,7 +45,6 @@ api.interceptors.response.use(
     error => {
         console.error('❌ Error API:', error.response?.data || error.message);
         
-        // Si es 401 o 403 (no autorizado), limpiar y redirigir a login
         if (error.response?.status === 401 || error.response?.status === 403) {
             console.warn('🔒 Sesión expirada, redirigiendo al login...');
             localStorage.removeItem('token');
@@ -167,19 +165,218 @@ const ClientesAPI = {
 };
 
 // ============================================
+// FUNCIONES API - PROVEEDORES
+// ============================================
+
+const ProveedoresAPI = {
+    getAll: (params = {}) => {
+        const query = new URLSearchParams(params).toString();
+        return api.get(`/proveedores${query ? '?' + query : ''}`);
+    },
+    
+    getById: (id) => api.get(`/proveedores/${id}`),
+    
+    create: (data) => api.post('/proveedores', data),
+    
+    update: (id, data) => api.put(`/proveedores/${id}`, data),
+    
+    cambiarEstado: (id, estado) => api.patch(`/proveedores/${id}/estado`, { estado }),
+    
+    delete: (id) => api.delete(`/proveedores/${id}`),
+    
+    getHistorialCompras: (id, limit = 10) => api.get(`/proveedores/${id}/compras?limit=${limit}`),
+    
+    getEstadisticas: (id) => api.get(`/proveedores/${id}/estadisticas`)
+};
+
+// ============================================
+// FUNCIONES API - ALMACENES ✨ NUEVO
+// ============================================
+
+const AlmacenesAPI = {
+    /**
+     * Obtener todos los almacenes con filtros opcionales
+     * @param {Object} params - Filtros: { estado: 'true'|'false' }
+     * @returns {Promise} Lista de almacenes
+     */
+    getAll: (params = {}) => {
+        const query = new URLSearchParams(params).toString();
+        return api.get(`/almacenes${query ? '?' + query : ''}`);
+    },
+    
+    /**
+     * Obtener almacén por ID
+     * @param {number} id - ID del almacén
+     * @returns {Promise} Almacén
+     */
+    getById: (id) => api.get(`/almacenes/${id}`),
+    
+    /**
+     * Obtener productos de un almacén
+     * @param {number} id - ID del almacén
+     * @returns {Promise} Lista de productos en el almacén
+     */
+    getProductos: (id) => api.get(`/almacenes/${id}/productos`),
+    
+    /**
+     * Crear nuevo almacén
+     * @param {Object} data - { nombre, ubicacion?, capacidad_maxima? }
+     * @returns {Promise} Almacén creado
+     */
+    create: (data) => api.post('/almacenes', data),
+    
+    /**
+     * Actualizar almacén existente
+     * @param {number} id - ID del almacén
+     * @param {Object} data - Datos a actualizar
+     * @returns {Promise} Almacén actualizado
+     */
+    update: (id, data) => api.put(`/almacenes/${id}`, data),
+    
+    /**
+     * Eliminar almacén (soft delete - marca como inactivo)
+     * @param {number} id - ID del almacén
+     * @returns {Promise} Confirmación de eliminación
+     */
+    delete: (id) => api.delete(`/almacenes/${id}`)
+};
+
+// ============================================
+// FUNCIONES API - RECETAS
+// ============================================
+
+const RecetasAPI = {
+    /**
+     * Obtener todas las recetas con filtros opcionales
+     * @param {Object} params - Filtros: { estado: 'true'|'false', id_producto: number }
+     * @returns {Promise} Lista de recetas
+     */
+    getAll: (params = {}) => {
+        const query = new URLSearchParams(params).toString();
+        return api.get(`/recetas${query ? '?' + query : ''}`);
+    },
+    
+    /**
+     * Obtener receta por ID con sus ingredientes
+     * @param {number} id - ID de la receta
+     * @returns {Promise} Receta con ingredientes
+     */
+    getById: (id) => api.get(`/recetas/${id}`),
+    
+    /**
+     * Crear nueva receta con ingredientes
+     * @param {Object} data - { nombre, descripcion?, id_producto?, tiempo_produccion?, rendimiento, ingredientes: [{id_producto, cantidad, unidad}] }
+     * @returns {Promise} Receta creada
+     */
+    create: (data) => api.post('/recetas', data),
+    
+    /**
+     * Actualizar receta existente
+     * @param {number} id - ID de la receta
+     * @param {Object} data - Datos a actualizar (incluir ingredientes si se desean actualizar)
+     * @returns {Promise} Receta actualizada
+     */
+    update: (id, data) => api.put(`/recetas/${id}`, data),
+    
+    /**
+     * Eliminar receta (soft delete - marca como inactiva)
+     * @param {number} id - ID de la receta
+     * @returns {Promise} Confirmación de eliminación
+     */
+    delete: (id) => api.delete(`/recetas/${id}`)
+};
+
+// ============================================
+// FUNCIONES API - PRODUCCIÓN ✨ NUEVO
+// ============================================
+
+const ProduccionAPI = {
+    /**
+     * Obtener todas las producciones con filtros
+     * @param {Object} params - Filtros: { estado, id_almacen, fecha_desde, fecha_hasta }
+     */
+    getAll: (params = {}) => {
+        const query = new URLSearchParams(params).toString();
+        return api.get(`/producciones${query ? '?' + query : ''}`);
+    },
+    
+    /**
+     * Obtener producción por ID con ingredientes
+     */
+    getById: (id) => api.get(`/producciones/${id}`),
+    
+    /**
+     * Crear nueva orden de producción (valida stock)
+     */
+    create: (data) => api.post('/producciones', data),
+    
+    /**
+     * Iniciar producción (descuenta ingredientes)
+     */
+    iniciar: (id) => api.patch(`/producciones/${id}/iniciar`),
+    
+    /**
+     * Completar producción (agrega producto terminado)
+     */
+    completar: (id, data) => api.patch(`/producciones/${id}/completar`, data),
+    
+    /**
+     * Cancelar producción
+     */
+    cancelar: (id, data) => api.patch(`/producciones/${id}/cancelar`, data)
+};
+// ============================================
+// FUNCIONES API - AUTENTICACIÓN ✨ AGREGAR
+// ============================================
+
+const AuthAPI = {
+    /**
+     * Registrar nuevo usuario (asigna rol Cliente automáticamente)
+     * @param {Object} data - { nombre, email, password, telefono?, direccion?, nit? }
+     * @returns {Promise} Usuario registrado
+     */
+    register: (data) => api.post('/auth/register', data),
+    
+    /**
+     * Iniciar sesión
+     * @param {Object} credentials - { email, password }
+     * @returns {Promise} { token, user }
+     */
+    login: (credentials) => api.post('/auth/login', credentials),
+    
+    /**
+     * Cerrar sesión (opcional si tienes logout en backend)
+     */
+    logout: () => api.post('/auth/logout'),
+    
+    /**
+     * Verificar token
+     */
+    verifyToken: () => api.get('/auth/verify'),
+    
+    /**
+     * Refrescar token
+     */
+    refreshToken: () => api.post('/auth/refresh')
+};
+// ============================================
 // EXPORTAR COMO WINDOW.API
 // ============================================
 
 window.API = {
+    Auth: AuthAPI,   
     Usuarios: UsuariosAPI,
     Roles: RolesAPI,
     Permisos: PermisosAPI,
     Productos: ProductosAPI,
     Categorias: CategoriasAPI,
-    Clientes: ClientesAPI
+    Clientes: ClientesAPI,
+    Proveedores: ProveedoresAPI,
+    Almacenes: AlmacenesAPI,
+    Recetas: RecetasAPI,
+    Produccion: ProduccionAPI  // ✨ NUEVO
 };
 
-// Exportar también el objeto axios por si se necesita
 window.api = api;
 
 console.log('✅ API configurada correctamente con Axios');

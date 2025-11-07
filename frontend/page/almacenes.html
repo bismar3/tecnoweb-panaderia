@@ -1,0 +1,431 @@
+<!-- almacenes.html - SIN <html>, <head>, solo contenido -->
+<div class="almacenes-container" style="padding: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h1><i class="fas fa-warehouse"></i> Gestión de Almacenes</h1>
+        <button id="btnNuevoAlmacen" style="background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+            <i class="fas fa-plus"></i> Nuevo Almacén
+        </button>
+    </div>
+
+    <!-- Filtros -->
+    <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+            <input type="text" id="buscarAlmacen" placeholder="Buscar almacén..." style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+            <select id="filtroEstado" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                <option value="">Todos los estados</option>
+                <option value="true">Activo</option>
+                <option value="false">Inactivo</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Tabla -->
+    <div style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <table id="tablaAlmacenes" style="width: 100%; border-collapse: collapse;">
+            <thead style="background: #f3f4f6;">
+                <tr>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Nombre</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Ubicación</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Capacidad Máxima</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Estado</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Productos</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <!-- Modal Crear/Editar -->
+    <div id="modalAlmacen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;">
+        <div style="background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 id="modalTitle"><i class="fas fa-warehouse"></i> Nuevo Almacén</h2>
+                <button id="btnCerrarModal" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #666;">&times;</button>
+            </div>
+            
+            <form id="formAlmacen">
+                <input type="hidden" name="id_almacen">
+                
+                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Nombre del Almacén:</label>
+                <input type="text" name="nombre" required style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+                
+                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Ubicación:</label>
+                <input type="text" name="ubicacion" placeholder="Ej: Planta Baja, Sector A" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+                
+                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Capacidad Máxima (m³):</label>
+                <input type="number" name="capacidad_maxima" step="0.01" min="0" placeholder="Opcional" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+                <small style="color: #666; display: block; margin-top: -10px; margin-bottom: 15px;">Deja en blanco si no aplica</small>
+                
+                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Estado:</label>
+                <select name="estado" style="width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 5px;">
+                    <option value="true">Activo</option>
+                    <option value="false">Inactivo</option>
+                </select>
+                
+                <button type="submit" style="width: 100%; background: #10b981; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: 600;">
+                    <i class="fas fa-save"></i> Guardar Almacén
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Ver Productos -->
+    <div id="modalProductos" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;">
+        <div style="background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2><i class="fas fa-boxes"></i> Productos en Almacén</h2>
+                <button id="btnCerrarProductos" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #666;">&times;</button>
+            </div>
+            
+            <div id="nombreAlmacenProductos" style="background: #f3f4f6; padding: 10px; border-radius: 5px; margin-bottom: 20px; font-weight: 600;"></div>
+            
+            <div id="contenidoProductos">
+                <!-- Se llenará dinámicamente -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(async function() {
+    console.log('🚀 Inicializando módulo de almacenes...');
+    
+    const api = window.api;
+    
+    if (!api) {
+        console.error('❌ API no está disponible. Asegúrate de cargar api.js antes.');
+        return;
+    }
+    
+    const tabla = document.querySelector('#tablaAlmacenes tbody');
+    const modal = document.getElementById('modalAlmacen');
+    const modalProductos = document.getElementById('modalProductos');
+    const form = document.getElementById('formAlmacen');
+    const btnNuevo = document.getElementById('btnNuevoAlmacen');
+    const btnCerrar = document.getElementById('btnCerrarModal');
+    const btnCerrarProductos = document.getElementById('btnCerrarProductos');
+    const filtroEstado = document.getElementById('filtroEstado');
+    const buscarAlmacen = document.getElementById('buscarAlmacen');
+
+    if (!tabla || !modal || !form) {
+        console.error('❌ Elementos del DOM no encontrados');
+        return;
+    }
+
+    // ============================================
+    // ABRIR/CERRAR MODALES
+    // ============================================
+    
+    btnNuevo.onclick = () => {
+        form.reset();
+        form.querySelector('[name="id_almacen"]').value = '';
+        document.getElementById('modalTitle').innerHTML = '<i class="fas fa-warehouse"></i> Nuevo Almacén';
+        modal.style.display = 'flex';
+    };
+
+    btnCerrar.onclick = () => modal.style.display = 'none';
+    btnCerrarProductos.onclick = () => modalProductos.style.display = 'none';
+    
+    modal.onclick = (e) => {
+        if (e.target === modal) modal.style.display = 'none';
+    };
+
+    modalProductos.onclick = (e) => {
+        if (e.target === modalProductos) modalProductos.style.display = 'none';
+    };
+
+    // ============================================
+    // CARGAR ALMACENES
+    // ============================================
+    
+    async function cargarAlmacenes() {
+        try {
+            console.log('📦 Cargando almacenes...');
+            
+            const params = new URLSearchParams();
+            
+            const buscar = buscarAlmacen.value.trim();
+            const estado = filtroEstado.value;
+            
+            if (estado) params.append('estado', estado);
+            
+            const queryString = params.toString();
+            const url = queryString ? `/almacenes?${queryString}` : '/almacenes';
+            
+            console.log('🔍 URL de búsqueda:', url);
+            
+            const response = await api.get(url);
+            console.log('📦 Respuesta almacenes:', response.data);
+            
+            let almacenes = response.data.data || response.data;
+            
+            if (!Array.isArray(almacenes)) {
+                console.error('❌ Almacenes no es un array:', almacenes);
+                tabla.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px; color: red;">Error: Formato de datos incorrecto</td></tr>';
+                return;
+            }
+
+            // Filtrar por búsqueda local
+            if (buscar) {
+                almacenes = almacenes.filter(a => 
+                    a.nombre.toLowerCase().includes(buscar.toLowerCase()) ||
+                    (a.ubicacion && a.ubicacion.toLowerCase().includes(buscar.toLowerCase()))
+                );
+            }
+            
+            console.log('✅ Almacenes cargados:', almacenes.length);
+            
+            if (almacenes.length === 0) {
+                tabla.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px; color: #666;">No se encontraron almacenes</td></tr>';
+                return;
+            }
+            
+            tabla.innerHTML = almacenes.map(a => `
+                <tr>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
+                        <strong>${a.nombre || 'N/A'}</strong>
+                    </td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${a.ubicacion || 'No especificada'}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
+                        ${a.capacidad_maxima ? parseFloat(a.capacidad_maxima).toFixed(2) + ' m³' : 'No definida'}
+                    </td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
+                        <span style="background: ${a.estado ? '#10b981' : '#ef4444'}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
+                            ${a.estado ? 'Activo' : 'Inactivo'}
+                        </span>
+                    </td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
+                        <button class="btn-ver-productos" data-id="${a.id_almacen}" data-nombre="${a.nombre}" style="background: #6366f1; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+                            <i class="fas fa-boxes"></i> Ver
+                        </button>
+                    </td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
+                        <button class="btn-edit" data-id="${a.id_almacen}" style="background: #3b82f6; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 5px;">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-delete" data-id="${a.id_almacen}" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+
+            // Event delegation
+            tabla.querySelectorAll('.btn-ver-productos').forEach(btn => {
+                btn.onclick = () => verProductos(btn.dataset.id, btn.dataset.nombre);
+            });
+            tabla.querySelectorAll('.btn-edit').forEach(btn => {
+                btn.onclick = () => editarAlmacen(btn.dataset.id);
+            });
+            tabla.querySelectorAll('.btn-delete').forEach(btn => {
+                btn.onclick = () => eliminarAlmacen(btn.dataset.id);
+            });
+
+        } catch (error) {
+            console.error('❌ Error al cargar almacenes:', error);
+            tabla.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align:center; padding: 20px; color: red;">
+                        Error al cargar almacenes: ${error.response?.data?.message || error.message}
+                    </td>
+                </tr>
+            `;
+        }
+    }
+
+    // ============================================
+    // VER PRODUCTOS DEL ALMACÉN
+    // ============================================
+    
+    async function verProductos(id, nombre) {
+        try {
+            document.getElementById('nombreAlmacenProductos').textContent = `Almacén: ${nombre}`;
+            
+            const response = await api.get(`/almacenes/${id}/productos`);
+            const productos = response.data.data || response.data;
+            
+            const contenido = document.getElementById('contenidoProductos');
+            
+            if (!productos || productos.length === 0) {
+                contenido.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #999;">
+                        <i class="fas fa-box-open" style="font-size: 3rem; margin-bottom: 10px;"></i>
+                        <p>No hay productos asignados a este almacén</p>
+                    </div>
+                `;
+            } else {
+                contenido.innerHTML = `
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead style="background: #f3f4f6;">
+                            <tr>
+                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Código</th>
+                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Producto</th>
+                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Cantidad</th>
+                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Stock Min</th>
+                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Stock Max</th>
+                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${productos.map(p => {
+                                const cantidad = parseFloat(p.cantidad);
+                                const stockMin = parseFloat(p.stock_minimo);
+                                const stockMax = p.stock_maximo ? parseFloat(p.stock_maximo) : null;
+                                
+                                let estadoStock = '';
+                                let colorEstado = '';
+                                
+                                if (cantidad <= 0) {
+                                    estadoStock = 'Sin stock';
+                                    colorEstado = '#ef4444';
+                                } else if (cantidad < stockMin) {
+                                    estadoStock = 'Stock bajo';
+                                    colorEstado = '#f59e0b';
+                                } else if (stockMax && cantidad > stockMax) {
+                                    estadoStock = 'Exceso';
+                                    colorEstado = '#6366f1';
+                                } else {
+                                    estadoStock = 'Normal';
+                                    colorEstado = '#10b981';
+                                }
+                                
+                                return `
+                                    <tr>
+                                        <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">${p.codigo}</td>
+                                        <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">${p.producto_nombre}</td>
+                                        <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;"><strong>${cantidad.toFixed(2)}</strong></td>
+                                        <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">${stockMin.toFixed(2)}</td>
+                                        <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">${stockMax ? stockMax.toFixed(2) : 'N/A'}</td>
+                                        <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">
+                                            <span style="background: ${colorEstado}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px;">
+                                                ${estadoStock}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                `;
+            }
+            
+            modalProductos.style.display = 'flex';
+        } catch (error) {
+            console.error('Error:', error);
+            alert('❌ Error al cargar productos del almacén');
+        }
+    }
+
+    // ============================================
+    // GUARDAR ALMACÉN
+    // ============================================
+    
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+        
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData);
+        
+        data.estado = data.estado === 'true';
+        
+        if (data.capacidad_maxima) {
+            data.capacidad_maxima = parseFloat(data.capacidad_maxima);
+        } else {
+            delete data.capacidad_maxima;
+        }
+        
+        if (!data.ubicacion) {
+            delete data.ubicacion;
+        }
+
+        try {
+            const idAlmacen = data.id_almacen;
+            
+            if (idAlmacen) {
+                await api.put(`/almacenes/${idAlmacen}`, data);
+                alert('✅ Almacén actualizado correctamente');
+            } else {
+                delete data.id_almacen;
+                await api.post('/almacenes', data);
+                alert('✅ Almacén creado correctamente');
+            }
+            
+            modal.style.display = 'none';
+            cargarAlmacenes();
+            
+        } catch (error) {
+            console.error('Error al guardar:', error);
+            alert('❌ Error al guardar almacén: ' + (error.response?.data?.message || error.message));
+        }
+    };
+
+    // ============================================
+    // EDITAR ALMACÉN
+    // ============================================
+    
+    async function editarAlmacen(id) {
+        try {
+            const response = await api.get(`/almacenes/${id}`);
+            const a = response.data.data || response.data;
+            
+            form.querySelector('[name="id_almacen"]').value = a.id_almacen;
+            form.querySelector('[name="nombre"]').value = a.nombre;
+            form.querySelector('[name="ubicacion"]').value = a.ubicacion || '';
+            form.querySelector('[name="capacidad_maxima"]').value = a.capacidad_maxima || '';
+            form.querySelector('[name="estado"]').value = a.estado.toString();
+            
+            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit"></i> Editar Almacén';
+            modal.style.display = 'flex';
+            
+        } catch (error) {
+            console.error('Error:', error);
+            alert('❌ Error al cargar almacén para editar');
+        }
+    }
+
+    // ============================================
+    // ELIMINAR ALMACÉN
+    // ============================================
+    
+    async function eliminarAlmacen(id) {
+        if (!confirm('¿Estás seguro de desactivar este almacén?\n\nLos productos asociados no se eliminarán.')) return;
+        
+        try {
+            await api.delete(`/almacenes/${id}`);
+            alert('✅ Almacén desactivado correctamente');
+            cargarAlmacenes();
+        } catch (error) {
+            console.error('Error:', error);
+            alert('❌ Error al eliminar almacén: ' + (error.response?.data?.message || error.message));
+        }
+    }
+
+    // ============================================
+    // EVENTOS DE FILTROS
+    // ============================================
+    
+    let timeoutBusqueda;
+    
+    buscarAlmacen.addEventListener('input', () => {
+        clearTimeout(timeoutBusqueda);
+        timeoutBusqueda = setTimeout(() => {
+            console.log('🔍 Buscando:', buscarAlmacen.value);
+            cargarAlmacenes();
+        }, 500);
+    });
+
+    filtroEstado.addEventListener('change', () => {
+        console.log('🔘 Filtro estado:', filtroEstado.value);
+        cargarAlmacenes();
+    });
+
+    // ============================================
+    // INICIALIZAR
+    // ============================================
+    
+    await cargarAlmacenes();
+    
+    console.log('✅ Módulo de almacenes inicializado correctamente');
+})();
+</script>

@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Panadería Belén</title>
+    <title>Dashboard Cliente - Panadería Belén</title>
     <link rel="stylesheet" href="../css/themes.css">
     <link rel="stylesheet" href="../css/dashboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 </head>
 <body data-theme="light">
     <!-- HEADER -->
@@ -28,27 +27,21 @@
             <div class="dropdown">
                 <button class="dropdown-btn" onclick="toggleDropdown('notificationMenu')">
                     <i class="fas fa-bell"></i>
-                    <span class="notification-badge">3</span>
+                    <span class="notification-badge">2</span>
                 </button>
                 <div class="dropdown-menu" id="notificationMenu" style="min-width: 300px;">
                     <div style="padding: 0.75rem 1rem; border-bottom: 1px solid #4a5568; color: white; font-weight: 600;">
                         Notificaciones
                     </div>
-                    <a href="#"><i class="fas fa-shopping-cart" style="color: #3b82f6;"></i>
+                    <a href="#"><i class="fas fa-truck" style="color: #3b82f6;"></i>
                         <div>
-                            <strong>Nuevo pedido #1234</strong><br>
-                            <small style="color: #cbd5e0;">Hace 5 minutos</small>
+                            <strong>Tu pedido #5678 está en camino</strong><br>
+                            <small style="color: #cbd5e0;">Hace 10 minutos</small>
                         </div>
                     </a>
-                    <a href="#"><i class="fas fa-exclamation-triangle" style="color: #f59e0b;"></i>
+                    <a href="#"><i class="fas fa-tags" style="color: #10b981;"></i>
                         <div>
-                            <strong>Stock bajo: Harina 000</strong><br>
-                            <small style="color: #cbd5e0;">Hace 30 minutos</small>
-                        </div>
-                    </a>
-                    <a href="#"><i class="fas fa-check-circle" style="color: #10b981;"></i>
-                        <div>
-                            <strong>Pedido #1230 completado</strong><br>
+                            <strong>Nueva promoción: 20% off en panes</strong><br>
                             <small style="color: #cbd5e0;">Hace 1 hora</small>
                         </div>
                     </a>
@@ -76,34 +69,20 @@
     <!-- SIDEBAR -->
     <nav id="sidebar" class="sidebar">
         <div class="sidebar-header">
-            <h3>Menú Principal</h3>
+            <h3>Menú Cliente</h3>
         </div>
         <ul class="sidebar-menu">
             <li><a href="#" id="link-home" class="active" data-section="home"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
-            <li class="menu-section"><span>VENTAS Y CLIENTES</span></li>
-            <li><a href="#" id="link-pedidos" data-section="pedidos"><i class="fas fa-shopping-cart"></i> <span>Pedidos</span><span class="badge">5</span></a></li>
-            <li><a href="#" id="link-clientes" data-section="clientes"><i class="fas fa-users"></i> <span>Clientes</span></a></li>
-            <li><a href="#" id="link-entregas" data-section="entregas"><i class="fas fa-truck"></i> <span>Entregas</span></a></li>
-            <li><a href="#" id="link-deliveries" data-section="deliveries"><i class="fas fa-motorcycle"></i> <span>Repartidores</span></a></li>
-            <li><a href="#" id="link-pagos" data-section="pagos"><i class="fas fa-credit-card"></i> <span>Pagos</span></a></li>
+            <li class="menu-section"><span>MIS COMPRAS</span></li>
+            <li><a href="#" id="link-pedidos" data-section="pedidos"><i class="fas fa-shopping-cart"></i> <span>Mis Pedidos</span><span class="badge">2</span></a></li>
+            <li><a href="#" id="link-entregas" data-section="entregas"><i class="fas fa-truck"></i> <span>Mis Entregas</span></a></li>
+            <li><a href="#" id="link-pagos" data-section="pagos"><i class="fas fa-credit-card"></i> <span>Mis Pagos</span></a></li>
             <li><a href="#" id="link-promociones" data-section="promociones"><i class="fas fa-tags"></i> <span>Promociones</span></a></li>
-            <li class="menu-section"><span>INVENTARIO</span></li>
-            <li><a href="#" id="link-productos" data-section="productos"><i class="fas fa-boxes"></i> <span>Productos</span></a></li>
+            <li class="menu-section"><span>PRODUCTOS</span></li>
+            <li><a href="#" id="link-productos" data-section="productos"><i class="fas fa-boxes"></i> <span>Catálogo de Productos</span></a></li>
             <li><a href="#" id="link-categorias" data-section="categorias"><i class="fas fa-list"></i> <span>Categorías</span></a></li>
-            <li><a href="#" id="link-almacenes" data-section="almacenes"><i class="fas fa-warehouse"></i> <span>Almacenes</span></a></li>
-            <li><a href="#" id="link-inventario" data-section="inventario"><i class="fas fa-clipboard-list"></i> <span>Control de Stock</span></a></li>
-            <li><a href="#" id="link-movimientos" data-section="movimientos"><i class="fas fa-exchange-alt"></i> <span>Movimientos</span></a></li>
-            <li class="menu-section"><span>COMPRAS</span></li>
-            <li><a href="#" id="link-compras" data-section="compras"><i class="fas fa-file-invoice-dollar"></i> <span>Compras</span></a></li>
-            <li><a href="#" id="link-proveedores" data-section="proveedores"><i class="fas fa-truck-loading"></i> <span>Proveedores</span></a></li>
-            <li class="menu-section"><span>PRODUCCIÓN</span></li>
-            <li><a href="#" id="link-produccion" data-section="produccion"><i class="fas fa-industry"></i> <span>Órdenes de Producción</span></a></li>
-           <li><a href="#" id="link-recetas" data-section="recetas"><i class="fas fa-book"></i> <span>Recetas</span></a></li>
-            <li class="menu-section"><span>ADMINISTRACIÓN</span></li>
-            <li><a href="administracion/usuarios.html" id="link-usuarios" data-section="usuarios"><i class="fas fa-user-shield"></i> <span>Usuarios</span></a></li>
-            <li><a href="#" id="link-roles" data-section="roles"><i class="fas fa-user-tag"></i> <span>Roles y Permisos</span></a></li>
-            <li><a href="#" id="link-reportes" data-section="reportes"><i class="fas fa-chart-line"></i> <span>Reportes</span></a></li>
-            <li><a href="#" id="link-auditoria" data-section="auditoria"><i class="fas fa-clipboard-check"></i> <span>Auditoría</span></a></li>
+            <li class="menu-section"><span>MI CUENTA</span></li>
+            <li><a href="#" id="link-perfil" data-section="perfil"><i class="fas fa-user"></i> <span>Mi Perfil</span></a></li>
             <li><a href="#" id="link-configuracion" data-section="configuracion"><i class="fas fa-cog"></i> <span>Configuración</span></a></li>
         </ul>
         <div class="sidebar-footer">

@@ -1,4 +1,4 @@
-<!-- compras.html - SIN <html>, <head>, solo contenido -->
+<!-- compras.html - MEJORADO -->
 <div class="compras-container" style="padding: 20px;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <h1><i class="fas fa-file-invoice-dollar"></i> Gestión de Compras</h1>
@@ -15,24 +15,29 @@
             </select>
             <select id="filtroEstado" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
                 <option value="">Todos los estados</option>
+                <option value="borrador">Borrador</option>
                 <option value="pendiente">Pendiente</option>
-                <option value="recibido">Recibido</option>
-                <option value="cancelado">Cancelado</option>
+                <option value="recibida">Recibida</option>
+                <option value="facturada">Facturada</option>
+                <option value="pagada">Pagada</option>
+                <option value="cancelada">Cancelada</option>
             </select>
             <input type="date" id="filtroFechaDesde" placeholder="Fecha desde" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
             <input type="date" id="filtroFechaHasta" placeholder="Fecha hasta" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+            <input type="text" id="filtroNumeroFactura" placeholder="Número de factura..." style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
         </div>
     </div>
 
     <!-- Tabla -->
     <div style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
         <div style="overflow-x: auto;">
-            <table id="tablaCompras" style="width: 100%; border-collapse: collapse; min-width: 900px;">
+            <table id="tablaCompras" style="width: 100%; border-collapse: collapse; min-width: 1200px;">
                 <thead style="background: #f3f4f6;">
                     <tr>
                         <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">N° Compra</th>
                         <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Fecha</th>
                         <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Proveedor</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">N° Factura</th>
                         <th style="padding: 12px; text-align: right; border-bottom: 2px solid #e5e7eb;">Total</th>
                         <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Estado</th>
                         <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Usuario</th>
@@ -46,18 +51,18 @@
 
     <!-- Modal Nueva/Editar Compra -->
     <div id="modalCompra" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; overflow-y: auto;">
-        <div style="background: white; padding: 30px; border-radius: 10px; width: 95%; max-width: 1000px; max-height: 90vh; overflow-y: auto; margin: 20px;">
+        <div style="background: white; padding: 30px; border-radius: 10px; width: 95%; max-width: 1200px; max-height: 90vh; overflow-y: auto; margin: 20px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 id="modalTitle">Nueva Compra</h2>
+                <h2 id="modalTitle">Nueva Orden de Compra</h2>
                 <button id="btnCerrarModal" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #666;">&times;</button>
             </div>
             
             <form id="formCompra">
                 <input type="hidden" name="id_compra">
                 
-                <!-- Datos generales -->
+                <!-- Información General -->
                 <div style="background: #f9fafb; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                    <h3 style="margin: 0 0 15px 0; color: #374151;">Información General</h3>
+                    <h3 style="margin: 0 0 15px 0; color: #374151;"><i class="fas fa-info-circle"></i> Información General</h3>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
                         <div>
                             <label style="display: block; margin-bottom: 5px; font-weight: 600;">Proveedor:</label>
@@ -74,32 +79,81 @@
                         </div>
                         
                         <div>
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Forma de Pago:</label>
+                            <select name="forma_pago" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                                <option value="">Seleccionar...</option>
+                                <option value="Efectivo">Efectivo</option>
+                                <option value="Transferencia">Transferencia</option>
+                                <option value="Cheque">Cheque</option>
+                                <option value="Tarjeta">Tarjeta</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Condición de Pago:</label>
+                            <select name="condicion_pago" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                                <option value="">Seleccionar...</option>
+                                <option value="Contado">Contado</option>
+                                <option value="15 días">15 días</option>
+                                <option value="30 días">30 días</option>
+                                <option value="45 días">45 días</option>
+                                <option value="60 días">60 días</option>
+                                <option value="90 días">90 días</option>
+                            </select>
+                        </div>
+                        
+                        <div>
                             <label style="display: block; margin-bottom: 5px; font-weight: 600;">Estado:</label>
                             <select name="estado" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                                <option value="borrador">Borrador</option>
                                 <option value="pendiente">Pendiente</option>
-                                <option value="recibido">Recibido</option>
+                                <option value="recibida">Recibida</option>
                             </select>
+                            <small style="color: #666; font-size: 0.85rem;">Cambie a "Recibida" para actualizar inventario</small>
                         </div>
                     </div>
                 </div>
 
-                <!-- Productos -->
+                <!-- Facturación -->
+                <div style="background: #f9fafb; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="margin: 0 0 15px 0; color: #374151;"><i class="fas fa-file-invoice"></i> Información de Factura</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <div>
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Número de Factura:</label>
+                            <input type="text" name="numero_factura" placeholder="FAC-2025-00123" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        </div>
+                        
+                        <div>
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Serie:</label>
+                            <input type="text" name="serie_factura" placeholder="A001" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        </div>
+                        
+                        <div>
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Fecha Factura:</label>
+                            <input type="date" name="fecha_factura" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Productos/Ingredientes -->
                 <div style="background: #f9fafb; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                        <h3 style="margin: 0; color: #374151;">Productos</h3>
+                        <h3 style="margin: 0; color: #374151;"><i class="fas fa-boxes"></i> Ingredientes</h3>
                         <button type="button" id="btnAgregarProducto" style="background: #10b981; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;">
-                            <i class="fas fa-plus"></i> Agregar Producto
+                            <i class="fas fa-plus"></i> Agregar Ingrediente
                         </button>
                     </div>
                     
                     <div style="overflow-x: auto;">
-                        <table id="tablaDetalles" style="width: 100%; border-collapse: collapse; min-width: 700px;">
+                        <table id="tablaDetalles" style="width: 100%; border-collapse: collapse; min-width: 900px;">
                             <thead style="background: #e5e7eb;">
                                 <tr>
-                                    <th style="padding: 10px; text-align: left; border: 1px solid #d1d5db;">Producto</th>
-                                    <th style="padding: 10px; text-align: center; border: 1px solid #d1d5db; width: 120px;">Cantidad</th>
-                                    <th style="padding: 10px; text-align: right; border: 1px solid #d1d5db; width: 150px;">Costo Unitario</th>
-                                    <th style="padding: 10px; text-align: right; border: 1px solid #d1d5db; width: 150px;">Subtotal</th>
+                                    <th style="padding: 10px; text-align: left; border: 1px solid #d1d5db;">Ingrediente</th>
+                                    <th style="padding: 10px; text-align: center; border: 1px solid #d1d5db; width: 100px;">Cantidad</th>
+                                    <th style="padding: 10px; text-align: right; border: 1px solid #d1d5db; width: 120px;">Costo Unit.</th>
+                                    <th style="padding: 10px; text-align: center; border: 1px solid #d1d5db; width: 100px;">Desc. %</th>
+                                    <th style="padding: 10px; text-align: right; border: 1px solid #d1d5db; width: 120px;">Desc. Bs.</th>
+                                    <th style="padding: 10px; text-align: right; border: 1px solid #d1d5db; width: 130px;">Subtotal</th>
                                     <th style="padding: 10px; text-align: center; border: 1px solid #d1d5db; width: 80px;">Acción</th>
                                 </tr>
                             </thead>
@@ -109,30 +163,42 @@
                     
                     <div id="mensajeProductos" style="text-align: center; padding: 30px; color: #9ca3af; display: none;">
                         <i class="fas fa-box-open" style="font-size: 3rem; margin-bottom: 10px; opacity: 0.5;"></i>
-                        <p>No hay productos agregados. Haz clic en "Agregar Producto"</p>
+                        <p>No hay ingredientes agregados. Haz clic en "Agregar Ingrediente"</p>
                     </div>
                 </div>
 
-                <!-- Totales -->
+                <!-- Totales y Observaciones -->
                 <div style="background: #f9fafb; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                    <div style="display: grid; grid-template-columns: 1fr 300px; gap: 20px; align-items: start;">
+                    <div style="display: grid; grid-template-columns: 1fr 350px; gap: 20px; align-items: start;">
                         <div>
                             <label style="display: block; margin-bottom: 5px; font-weight: 600;">Observaciones:</label>
-                            <textarea name="observaciones" rows="4" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;"></textarea>
+                            <textarea name="observaciones" rows="6" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;"></textarea>
                         </div>
                         
                         <div>
                             <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb;">
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; color: #666;">
+                                    <span>Subtotal Exento:</span>
+                                    <span id="subtotalExentoDisplay">Bs. 0.00</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; color: #666;">
+                                    <span>Subtotal Gravado:</span>
+                                    <span id="subtotalGravadoDisplay">Bs. 0.00</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: 600;">
                                     <span>Subtotal:</span>
-                                    <strong id="subtotalDisplay">Bs. 0.00</strong>
+                                    <span id="subtotalDisplay">Bs. 0.00</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; color: #10b981; font-weight: 600;">
+                                    <span>IVA (13%):</span>
+                                    <span id="ivaDisplay">Bs. 0.00</span>
                                 </div>
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                                    <label>Impuestos:</label>
-                                    <input type="number" name="impuestos" id="impuestosInput" step="0.01" min="0" value="0" style="width: 120px; padding: 5px; border: 1px solid #ddd; border-radius: 5px; text-align: right;">
+                                    <label>Impuestos Adicionales:</label>
+                                    <input type="number" name="impuestos_adicionales" id="impuestosAdicionalesInput" step="0.01" min="0" value="0" style="width: 120px; padding: 5px; border: 1px solid #ddd; border-radius: 5px; text-align: right;">
                                 </div>
                                 <div style="border-top: 2px solid #e5e7eb; padding-top: 10px; margin-top: 10px;">
-                                    <div style="display: flex; justify-content: space-between; font-size: 1.2rem;">
+                                    <div style="display: flex; justify-content: space-between; font-size: 1.25rem;">
                                         <strong>Total:</strong>
                                         <strong id="totalDisplay" style="color: #3b82f6;">Bs. 0.00</strong>
                                     </div>
@@ -151,7 +217,7 @@
 
     <!-- Modal Ver Detalle -->
     <div id="modalDetalle" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;">
-        <div style="background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 900px; max-height: 90vh; overflow-y: auto;">
+        <div style="background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 1000px; max-height: 90vh; overflow-y: auto;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h2><i class="fas fa-file-invoice"></i> Detalle de Compra</h2>
                 <button id="btnCerrarDetalle" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #666;">&times;</button>
@@ -163,26 +229,24 @@
 
 <script>
 (async function() {
-    console.log('🚀 Inicializando módulo de compras...');
+    console.log('🚀 Inicializando módulo de compras mejorado...');
     
     const api = window.api;
-    
     if (!api) {
         console.error('❌ API no está disponible');
         return;
     }
     
-    // ⭐ AGREGAR ESTO AQUÍ ⭐
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     if (token) {
         api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        console.log('🔑 Token configurado manualmente');
     } else {
         alert('⚠️ No hay sesión activa');
         window.location.href = '/frontend/page/login.html';
         return;
     }
     
+    // Referencias DOM
     const tabla = document.querySelector('#tablaCompras tbody');
     const modal = document.getElementById('modalCompra');
     const modalDetalle = document.getElementById('modalDetalle');
@@ -193,10 +257,10 @@
     const detallesBody = document.getElementById('detallesBody');
     const btnAgregarProducto = document.getElementById('btnAgregarProducto');
     const mensajeProductos = document.getElementById('mensajeProductos');
-    const impuestosInput = document.getElementById('impuestosInput');
+    const impuestosAdicionalesInput = document.getElementById('impuestosAdicionalesInput');
 
     let detallesCompra = [];
-    let productos = [];
+    let ingredientes = [];
     let proveedores = [];
     let almacenes = [];
 
@@ -209,7 +273,7 @@
         detallesCompra = [];
         renderizarDetalles();
         calcularTotales();
-        document.getElementById('modalTitle').textContent = 'Nueva Compra';
+        document.getElementById('modalTitle').textContent = 'Nueva Orden de Compra';
         modal.style.display = 'flex';
     };
 
@@ -229,13 +293,13 @@
     
     async function cargarDatosIniciales() {
         try {
-            const [prodRes, provRes, almRes] = await Promise.all([
-                api.get('/productos?estado=true'),
+            const [ingRes, provRes, almRes] = await Promise.all([
+                api.get('/ingredientes?estado=true'),
                 api.get('/proveedores?estado=true'),
                 api.get('/almacenes?estado=true')
             ]);
 
-            productos = prodRes.data.data || prodRes.data;
+            ingredientes = ingRes.data.data || ingRes.data;
             proveedores = provRes.data.data || provRes.data;
             almacenes = almRes.data.data || almRes.data;
 
@@ -259,14 +323,16 @@
     }
 
     // ============================================
-    // GESTIÓN DE DETALLES (PRODUCTOS)
+    // GESTIÓN DE DETALLES (INGREDIENTES)
     // ============================================
     
     btnAgregarProducto.onclick = () => {
         const fila = {
-            id_producto: '',
+            id_ingrediente: '',
             cantidad: 1,
-            costo_unitario: 0
+            costo_unitario: 0,
+            descuento_porcentaje: 0,
+            descuento_monto: 0
         };
         detallesCompra.push(fila);
         renderizarDetalles();
@@ -282,17 +348,20 @@
         mensajeProductos.style.display = 'none';
         
         detallesBody.innerHTML = detallesCompra.map((detalle, index) => {
-            const producto = productos.find(p => p.id_producto == detalle.id_producto);
-            const subtotal = (detalle.cantidad || 0) * (detalle.costo_unitario || 0);
+            const subtotalBruto = (detalle.cantidad || 0) * (detalle.costo_unitario || 0);
+            const descuento = detalle.descuento_porcentaje 
+                ? (subtotalBruto * detalle.descuento_porcentaje / 100)
+                : (detalle.descuento_monto || 0);
+            const subtotal = subtotalBruto - descuento;
             
             return `
                 <tr>
                     <td style="padding: 8px; border: 1px solid #d1d5db;">
-                        <select class="producto-select" data-index="${index}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                            <option value="">Seleccionar producto</option>
-                            ${productos.map(p => 
-                                `<option value="${p.id_producto}" ${p.id_producto == detalle.id_producto ? 'selected' : ''}>
-                                    ${p.codigo} - ${p.nombre} (${p.unidad_medida})
+                        <select class="ingrediente-select" data-index="${index}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            <option value="">Seleccionar ingrediente</option>
+                            ${ingredientes.map(i => 
+                                `<option value="${i.id_ingrediente}" ${i.id_ingrediente == detalle.id_ingrediente ? 'selected' : ''}>
+                                    ${i.codigo} - ${i.nombre} (${i.unidad_medida})
                                 </option>`
                             ).join('')}
                         </select>
@@ -302,6 +371,12 @@
                     </td>
                     <td style="padding: 8px; border: 1px solid #d1d5db;">
                         <input type="number" class="costo-input" data-index="${index}" value="${detalle.costo_unitario}" min="0" step="0.01" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; text-align: right;">
+                    </td>
+                    <td style="padding: 8px; border: 1px solid #d1d5db;">
+                        <input type="number" class="descuento-porcentaje-input" data-index="${index}" value="${detalle.descuento_porcentaje}" min="0" max="100" step="0.01" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; text-align: center;">
+                    </td>
+                    <td style="padding: 8px; border: 1px solid #d1d5db;">
+                        <input type="number" class="descuento-monto-input" data-index="${index}" value="${detalle.descuento_monto}" min="0" step="0.01" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; text-align: right;">
                     </td>
                     <td style="padding: 8px; border: 1px solid #d1d5db; text-align: right; font-weight: 600;">
                         Bs. ${subtotal.toFixed(2)}
@@ -316,18 +391,16 @@
         }).join('');
 
         // Event listeners
-        document.querySelectorAll('.producto-select').forEach(select => {
+        document.querySelectorAll('.ingrediente-select').forEach(select => {
             select.onchange = function() {
-                const index = this.dataset.index;
-                detallesCompra[index].id_producto = this.value;
+                detallesCompra[this.dataset.index].id_ingrediente = this.value;
                 calcularTotales();
             };
         });
 
         document.querySelectorAll('.cantidad-input').forEach(input => {
             input.oninput = function() {
-                const index = this.dataset.index;
-                detallesCompra[index].cantidad = parseFloat(this.value) || 0;
+                detallesCompra[this.dataset.index].cantidad = parseFloat(this.value) || 0;
                 calcularTotales();
                 renderizarDetalles();
             };
@@ -335,8 +408,27 @@
 
         document.querySelectorAll('.costo-input').forEach(input => {
             input.oninput = function() {
+                detallesCompra[this.dataset.index].costo_unitario = parseFloat(this.value) || 0;
+                calcularTotales();
+                renderizarDetalles();
+            };
+        });
+
+        document.querySelectorAll('.descuento-porcentaje-input').forEach(input => {
+            input.oninput = function() {
                 const index = this.dataset.index;
-                detallesCompra[index].costo_unitario = parseFloat(this.value) || 0;
+                detallesCompra[index].descuento_porcentaje = parseFloat(this.value) || 0;
+                detallesCompra[index].descuento_monto = 0; // Reset monto si se usa porcentaje
+                calcularTotales();
+                renderizarDetalles();
+            };
+        });
+
+        document.querySelectorAll('.descuento-monto-input').forEach(input => {
+            input.oninput = function() {
+                const index = this.dataset.index;
+                detallesCompra[index].descuento_monto = parseFloat(this.value) || 0;
+                detallesCompra[index].descuento_porcentaje = 0; // Reset porcentaje si se usa monto
                 calcularTotales();
                 renderizarDetalles();
             };
@@ -344,8 +436,7 @@
 
         document.querySelectorAll('.btn-eliminar-detalle').forEach(btn => {
             btn.onclick = function() {
-                const index = parseInt(this.dataset.index);
-                detallesCompra.splice(index, 1);
+                detallesCompra.splice(this.dataset.index, 1);
                 renderizarDetalles();
                 calcularTotales();
             };
@@ -353,18 +444,33 @@
     }
 
     function calcularTotales() {
-        const subtotal = detallesCompra.reduce((sum, d) => {
-            return sum + ((d.cantidad || 0) * (d.costo_unitario || 0));
-        }, 0);
+        let subtotal = 0;
+        let subtotalExento = 0;
+        let subtotalGravado = 0;
 
-        const impuestos = parseFloat(impuestosInput.value) || 0;
-        const total = subtotal + impuestos;
+        detallesCompra.forEach(d => {
+            const subtotalBruto = (d.cantidad || 0) * (d.costo_unitario || 0);
+            const descuento = d.descuento_porcentaje 
+                ? (subtotalBruto * d.descuento_porcentaje / 100)
+                : (d.descuento_monto || 0);
+            const subtotalDetalle = subtotalBruto - descuento;
+            
+            subtotal += subtotalDetalle;
+            subtotalGravado += subtotalDetalle; // Por ahora todos están gravados
+        });
 
+        const iva = subtotalGravado * 0.13;
+        const impuestosAdicionales = parseFloat(impuestosAdicionalesInput.value) || 0;
+        const total = subtotal + iva + impuestosAdicionales;
+
+        document.getElementById('subtotalExentoDisplay').textContent = `Bs. ${subtotalExento.toFixed(2)}`;
+        document.getElementById('subtotalGravadoDisplay').textContent = `Bs. ${subtotalGravado.toFixed(2)}`;
         document.getElementById('subtotalDisplay').textContent = `Bs. ${subtotal.toFixed(2)}`;
+        document.getElementById('ivaDisplay').textContent = `Bs. ${iva.toFixed(2)}`;
         document.getElementById('totalDisplay').textContent = `Bs. ${total.toFixed(2)}`;
     }
 
-    impuestosInput.oninput = calcularTotales;
+    impuestosAdicionalesInput.oninput = calcularTotales;
 
     // ============================================
     // CARGAR COMPRAS
@@ -378,11 +484,13 @@
             const estado = document.getElementById('filtroEstado').value;
             const fechaDesde = document.getElementById('filtroFechaDesde').value;
             const fechaHasta = document.getElementById('filtroFechaHasta').value;
+            const numeroFactura = document.getElementById('filtroNumeroFactura').value;
             
             if (proveedor) params.append('id_proveedor', proveedor);
             if (estado) params.append('estado', estado);
             if (fechaDesde) params.append('fecha_desde', fechaDesde);
             if (fechaHasta) params.append('fecha_hasta', fechaHasta);
+            if (numeroFactura) params.append('numero_factura', numeroFactura);
             
             const queryString = params.toString();
             const url = queryString ? `/compras?${queryString}` : '/compras';
@@ -391,26 +499,32 @@
             const compras = response.data.data || response.data;
             
             if (compras.length === 0) {
-                tabla.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px; color: #666;">No se encontraron compras</td></tr>';
+                tabla.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 20px; color: #666;">No se encontraron compras</td></tr>';
                 return;
             }
             
             tabla.innerHTML = compras.map(c => {
-                const estadoColor = {
-                    'pendiente': '#f59e0b',
-                    'recibido': '#10b981',
-                    'cancelado': '#ef4444'
+                const estadoConfig = {
+                    'borrador': { color: '#9ca3af', icon: 'file' },
+                    'pendiente': { color: '#f59e0b', icon: 'clock' },
+                    'recibida': { color: '#10b981', icon: 'check-circle' },
+                    'facturada': { color: '#3b82f6', icon: 'file-invoice' },
+                    'pagada': { color: '#8b5cf6', icon: 'check-double' },
+                    'cancelada': { color: '#ef4444', icon: 'times-circle' }
                 };
+                
+                const config = estadoConfig[c.estado] || { color: '#9ca3af', icon: 'question' };
                 
                 return `
                     <tr>
                         <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; font-weight: 600;">${c.numero_compra}</td>
                         <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${new Date(c.fecha_compra).toLocaleDateString('es-ES')}</td>
                         <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${c.proveedor_nombre || 'Compra directa'}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${c.numero_factura || '-'}</td>
                         <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: right; font-weight: 600; color: #10b981;">Bs. ${parseFloat(c.total).toFixed(2)}</td>
                         <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
-                            <span style="background: ${estadoColor[c.estado]}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; text-transform: capitalize;">
-                                ${c.estado}
+                            <span style="background: ${config.color}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; text-transform: capitalize;">
+                                <i class="fas fa-${config.icon}"></i> ${c.estado}
                             </span>
                         </td>
                         <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${c.usuario_nombre || 'N/A'}</td>
@@ -418,10 +532,22 @@
                             <button class="btn-ver" data-id="${c.id_compra}" style="background: #8b5cf6; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 5px;" title="Ver detalle">
                                 <i class="fas fa-eye"></i>
                             </button>
-                            ${c.estado === 'pendiente' ? `
-                                <button class="btn-recibir" data-id="${c.id_compra}" style="background: #10b981; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 5px;" title="Marcar como recibido">
+                            ${c.estado === 'borrador' || c.estado === 'pendiente' ? `
+                                <button class="btn-recibir" data-id="${c.id_compra}" style="background: #10b981; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 5px;" title="Marcar como recibida">
                                     <i class="fas fa-check"></i>
                                 </button>
+                            ` : ''}
+                            ${c.estado === 'recibida' && c.numero_factura ? `
+                                <button class="btn-facturar" data-id="${c.id_compra}" style="background: #3b82f6; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 5px;" title="Marcar como facturada">
+                                    <i class="fas fa-file-invoice"></i>
+                                </button>
+                            ` : ''}
+                            ${c.estado === 'facturada' ? `
+                                <button class="btn-pagar" data-id="${c.id_compra}" style="background: #8b5cf6; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 5px;" title="Marcar como pagada">
+                                    <i class="fas fa-dollar-sign"></i>
+                                </button>
+                            ` : ''}
+                            ${c.estado === 'borrador' || c.estado === 'pendiente' ? `
                                 <button class="btn-cancelar" data-id="${c.id_compra}" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;" title="Cancelar">
                                     <i class="fas fa-times"></i>
                                 </button>
@@ -431,11 +557,18 @@
                 `;
             }).join('');
 
+            // Event listeners
             tabla.querySelectorAll('.btn-ver').forEach(btn => {
                 btn.onclick = () => verDetalle(btn.dataset.id);
             });
             tabla.querySelectorAll('.btn-recibir').forEach(btn => {
-                btn.onclick = () => cambiarEstado(btn.dataset.id, 'recibido');
+                btn.onclick = () => cambiarEstado(btn.dataset.id, 'recibida');
+            });
+            tabla.querySelectorAll('.btn-facturar').forEach(btn => {
+                btn.onclick = () => cambiarEstado(btn.dataset.id, 'facturada');
+            });
+            tabla.querySelectorAll('.btn-pagar').forEach(btn => {
+                btn.onclick = () => cambiarEstado(btn.dataset.id, 'pagada');
             });
             tabla.querySelectorAll('.btn-cancelar').forEach(btn => {
                 btn.onclick = () => cancelarCompra(btn.dataset.id);
@@ -443,7 +576,7 @@
 
         } catch (error) {
             console.error('❌ Error al cargar compras:', error);
-            tabla.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 20px; color: red;">Error al cargar compras</td></tr>`;
+            tabla.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 20px; color: red;">Error al cargar compras</td></tr>`;
         }
     }
 
@@ -455,70 +588,78 @@
     document.getElementById('filtroEstado').addEventListener('change', cargarCompras);
     document.getElementById('filtroFechaDesde').addEventListener('change', cargarCompras);
     document.getElementById('filtroFechaHasta').addEventListener('change', cargarCompras);
+    document.getElementById('filtroNumeroFactura').addEventListener('input', () => {
+        clearTimeout(window.filtroFacturaTimeout);
+        window.filtroFacturaTimeout = setTimeout(cargarCompras, 500);
+    });
 
     // ============================================
     // GUARDAR COMPRA
     // ============================================
-// ============================================
-// GUARDAR COMPRA - VERSIÓN CORREGIDA
-// ============================================
+    
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+        
+        if (detallesCompra.length === 0) {
+            alert('❌ Debe agregar al menos un ingrediente');
+            return;
+        }
 
-form.onsubmit = async (e) => {
-    e.preventDefault();
-    
-    if (detallesCompra.length === 0) {
-        alert('❌ Debe agregar al menos un producto');
-        return;
-    }
+        const invalidos = detallesCompra.filter(d => 
+            !d.id_ingrediente || d.cantidad <= 0 || d.costo_unitario <= 0
+        );
+        
+        if (invalidos.length > 0) {
+            alert('❌ Todos los ingredientes deben tener: ingrediente seleccionado, cantidad y costo válidos');
+            return;
+        }
 
-    const invalidos = detallesCompra.filter(d => !d.id_producto || d.cantidad <= 0 || d.costo_unitario <= 0);
-    if (invalidos.length > 0) {
-        alert('❌ Todos los productos deben tener producto, cantidad y costo válidos');
-        return;
-    }
+        const formData = new FormData(form);
+        const idProveedor = formData.get('id_proveedor');
+        const idAlmacen = formData.get('id_almacen');
+        
+        if (!idAlmacen || idAlmacen === '') {
+            alert('❌ Debe seleccionar un almacén destino');
+            return;
+        }
+        
+        const data = {
+            id_proveedor: (idProveedor && idProveedor !== '') ? parseInt(idProveedor) : null,
+            id_almacen: parseInt(idAlmacen),
+            impuestos_adicionales: parseFloat(formData.get('impuestos_adicionales')) || 0,
+            observaciones: formData.get('observaciones') || null,
+            estado: formData.get('estado'),
+            numero_factura: formData.get('numero_factura') || null,
+            fecha_factura: formData.get('fecha_factura') || null,
+            serie_factura: formData.get('serie_factura') || null,
+            forma_pago: formData.get('forma_pago') || null,
+            condicion_pago: formData.get('condicion_pago') || null,
+            detalles: detallesCompra.map(d => ({
+                id_ingrediente: parseInt(d.id_ingrediente),
+                cantidad: parseFloat(d.cantidad),
+                costo_unitario: parseFloat(d.costo_unitario),
+                descuento_porcentaje: parseFloat(d.descuento_porcentaje) || null,
+                descuento_monto: parseFloat(d.descuento_monto) || null
+            }))
+        };
 
-    const formData = new FormData(form);
-    
-    // 🔧 CORRECCIÓN: Convertir string vacío a null para id_proveedor
-    const idProveedor = formData.get('id_proveedor');
-    const idAlmacen = formData.get('id_almacen');
-    
-    // Validar que el almacén esté seleccionado
-    if (!idAlmacen || idAlmacen === '') {
-        alert('❌ Debe seleccionar un almacén destino');
-        return;
-    }
-    
-    const data = {
-        // Si id_proveedor está vacío o es null, enviamos null
-        id_proveedor: (idProveedor && idProveedor !== '') ? parseInt(idProveedor) : null,
-        id_almacen: parseInt(idAlmacen),
-        impuestos: parseFloat(formData.get('impuestos')) || 0,
-        observaciones: formData.get('observaciones') || null,
-        estado: formData.get('estado'),
-        detalles: detallesCompra.map(d => ({
-            id_producto: parseInt(d.id_producto),
-            cantidad: parseFloat(d.cantidad),
-            costo_unitario: parseFloat(d.costo_unitario)
-        }))
+        console.log('📤 Datos a enviar:', data);
+
+        try {
+            const response = await api.post('/compras', data);
+            console.log('✅ Respuesta del servidor:', response.data);
+            alert('✅ ' + response.data.message);
+            modal.style.display = 'none';
+            form.reset();
+            detallesCompra = [];
+            cargarCompras();
+        } catch (error) {
+            console.error('❌ Error completo:', error);
+            console.error('❌ Respuesta del servidor:', error.response?.data);
+            alert('❌ Error al guardar compra: ' + (error.response?.data?.message || error.message));
+        }
     };
 
-    console.log('📤 Datos a enviar:', data);
-
-    try {
-        const response = await api.post('/compras', data);
-        console.log('✅ Respuesta del servidor:', response.data);
-        alert('✅ Compra registrada correctamente. Inventario actualizado.');
-        modal.style.display = 'none';
-        form.reset();
-        detallesCompra = [];
-        cargarCompras();
-    } catch (error) {
-        console.error('❌ Error completo:', error);
-        console.error('❌ Respuesta del servidor:', error.response?.data);
-        alert('❌ Error al guardar compra: ' + (error.response?.data?.message || error.message));
-    }
-};
     // ============================================
     // VER DETALLE
     // ============================================
@@ -528,63 +669,150 @@ form.onsubmit = async (e) => {
             const response = await api.get(`/compras/${id}`);
             const compra = response.data.data || response.data;
             
+            const estadoConfig = {
+                'borrador': { color: '#9ca3af', icon: 'file' },
+                'pendiente': { color: '#f59e0b', icon: 'clock' },
+                'recibida': { color: '#10b981', icon: 'check-circle' },
+                'facturada': { color: '#3b82f6', icon: 'file-invoice' },
+                'pagada': { color: '#8b5cf6', icon: 'check-double' },
+                'cancelada': { color: '#ef4444', icon: 'times-circle' }
+            };
+            
+            const config = estadoConfig[compra.estado] || { color: '#9ca3af', icon: 'question' };
+            
             const contenido = document.getElementById('contenidoDetalle');
             contenido.innerHTML = `
+                <!-- Información General -->
                 <div style="background: #f9fafb; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="margin: 0 0 15px 0; color: #374151;">Información General</h3>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
                         <div>
                             <strong>N° Compra:</strong><br>${compra.numero_compra}
                         </div>
                         <div>
-                            <strong>Fecha:</strong><br>${new Date(compra.fecha_compra).toLocaleDateString('es-ES')}
+                            <strong>Fecha Compra:</strong><br>${new Date(compra.fecha_compra).toLocaleDateString('es-ES')}
                         </div>
                         <div>
                             <strong>Proveedor:</strong><br>${compra.proveedor_nombre || 'Compra directa'}
+                            ${compra.proveedor_nit ? `<br><small>NIT: ${compra.proveedor_nit}</small>` : ''}
+                        </div>
+                        <div>
+                            <strong>Almacén:</strong><br>${compra.almacen_nombre || 'N/A'}
                         </div>
                         <div>
                             <strong>Estado:</strong><br>
-                            <span style="background: ${compra.estado === 'recibido' ? '#10b981' : compra.estado === 'cancelado' ? '#ef4444' : '#f59e0b'}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
-                                ${compra.estado}
+                            <span style="background: ${config.color}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
+                                <i class="fas fa-${config.icon}"></i> ${compra.estado}
                             </span>
+                        </div>
+                        <div>
+                            <strong>Forma de Pago:</strong><br>${compra.forma_pago || '-'}
+                        </div>
+                        <div>
+                            <strong>Condición:</strong><br>${compra.condicion_pago || '-'}
+                        </div>
+                        <div>
+                            <strong>Creado por:</strong><br>${compra.usuario_nombre || 'N/A'}
                         </div>
                     </div>
                 </div>
 
-                <h3>Productos</h3>
+                ${compra.numero_factura ? `
+                <div style="background: #f9fafb; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="margin: 0 0 15px 0; color: #374151;">Información de Factura</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <div>
+                            <strong>N° Factura:</strong><br>${compra.numero_factura}
+                        </div>
+                        ${compra.serie_factura ? `
+                        <div>
+                            <strong>Serie:</strong><br>${compra.serie_factura}
+                        </div>
+                        ` : ''}
+                        ${compra.fecha_factura ? `
+                        <div>
+                            <strong>Fecha Factura:</strong><br>${new Date(compra.fecha_factura).toLocaleDateString('es-ES')}
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+                ` : ''}
+
+                ${compra.fecha_recepcion ? `
+                <div style="background: #f9fafb; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="margin: 0 0 15px 0; color: #374151;">Información de Recepción</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <div>
+                            <strong>Fecha Recepción:</strong><br>${new Date(compra.fecha_recepcion).toLocaleString('es-ES')}
+                        </div>
+                        <div>
+                            <strong>Recibido por:</strong><br>${compra.recibido_por_nombre || 'N/A'}
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+
+                <!-- Ingredientes -->
+                <h3 style="margin: 20px 0 10px 0;">Ingredientes</h3>
                 <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
                     <thead style="background: #f3f4f6;">
                         <tr>
-                            <th style="padding: 10px; text-align: left; border: 1px solid #e5e7eb;">Producto</th>
+                            <th style="padding: 10px; text-align: left; border: 1px solid #e5e7eb;">Ingrediente</th>
                             <th style="padding: 10px; text-align: center; border: 1px solid #e5e7eb;">Cantidad</th>
                             <th style="padding: 10px; text-align: right; border: 1px solid #e5e7eb;">Costo Unit.</th>
+                            <th style="padding: 10px; text-align: right; border: 1px solid #e5e7eb;">Descuento</th>
                             <th style="padding: 10px; text-align: right; border: 1px solid #e5e7eb;">Subtotal</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${compra.detalles.map(d => `
+                        ${compra.detalles.map(d => {
+                            const descuento = d.descuento_porcentaje 
+                                ? `${d.descuento_porcentaje}%`
+                                : d.descuento_monto 
+                                    ? `Bs. ${parseFloat(d.descuento_monto).toFixed(2)}`
+                                    : '-';
+                            
+                            return `
                             <tr>
-                                <td style="padding: 10px; border: 1px solid #e5e7eb;">${d.producto_codigo} - ${d.producto_nombre}</td>
+                                <td style="padding: 10px; border: 1px solid #e5e7eb;">${d.ingrediente_codigo} - ${d.ingrediente_nombre}</td>
                                 <td style="padding: 10px; text-align: center; border: 1px solid #e5e7eb;">${d.cantidad} ${d.unidad_medida}</td>
                                 <td style="padding: 10px; text-align: right; border: 1px solid #e5e7eb;">Bs. ${parseFloat(d.costo_unitario).toFixed(2)}</td>
+                                <td style="padding: 10px; text-align: right; border: 1px solid #e5e7eb;">${descuento}</td>
                                 <td style="padding: 10px; text-align: right; border: 1px solid #e5e7eb; font-weight: 600;">Bs. ${parseFloat(d.subtotal).toFixed(2)}</td>
                             </tr>
-                        `).join('')}
+                            `;
+                        }).join('')}
                     </tbody>
                 </table>
 
+                <!-- Totales -->
                 <div style="background: #f9fafb; padding: 15px; border-radius: 8px;">
                     <div style="display: flex; justify-content: flex-end;">
-                        <div style="min-width: 300px;">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                                <span>Subtotal:</span>
-                                <strong>Bs. ${parseFloat(compra.subtotal).toFixed(2)}</strong>
+                        <div style="min-width: 350px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px; color: #666;">
+                                <span>Subtotal Exento:</span>
+                                <span>Bs. ${parseFloat(compra.subtotal_exento || 0).toFixed(2)}</span>
                             </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px; color: #666;">
+                                <span>Subtotal Gravado:</span>
+                                <span>Bs. ${parseFloat(compra.subtotal_gravado || 0).toFixed(2)}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: 600;">
+                                <span>Subtotal:</span>
+                                <span>Bs. ${parseFloat(compra.subtotal).toFixed(2)}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px; color: #10b981; font-weight: 600;">
+                                <span>IVA (13%):</span>
+                                <span>Bs. ${parseFloat(compra.iva || 0).toFixed(2)}</span>
+                            </div>
+                            ${compra.impuestos > 0 ? `
                             <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                                <span>Impuestos:</span>
+                                <span>Impuestos Adicionales:</span>
                                 <strong>Bs. ${parseFloat(compra.impuestos).toFixed(2)}</strong>
                             </div>
+                            ` : ''}
                             <div style="border-top: 2px solid #e5e7eb; padding-top: 10px; margin-top: 10px;">
-                                <div style="display: flex; justify-content: space-between; font-size: 1.2rem;">
+                                <div style="display: flex; justify-content: space-between; font-size: 1.25rem;">
                                     <strong>Total:</strong>
                                     <strong style="color: #10b981;">Bs. ${parseFloat(compra.total).toFixed(2)}</strong>
                                 </div>
@@ -594,7 +822,7 @@ form.onsubmit = async (e) => {
                     ${compra.observaciones ? `
                         <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e5e7eb;">
                             <strong>Observaciones:</strong><br>
-                            <p style="margin: 5px 0;">${compra.observaciones}</p>
+                            <p style="margin: 5px 0; color: #666;">${compra.observaciones}</p>
                         </div>
                     ` : ''}
                 </div>
@@ -612,11 +840,13 @@ form.onsubmit = async (e) => {
     // ============================================
     
     async function cambiarEstado(id, nuevoEstado) {
-        const mensaje = nuevoEstado === 'recibido' 
-            ? '¿Marcar esta compra como recibida? El inventario ya fue actualizado al crear la compra.'
-            : '¿Cambiar el estado de esta compra?';
-            
-        if (!confirm(mensaje)) return;
+        const mensajes = {
+            'recibida': '¿Marcar esta compra como recibida? Se actualizará el inventario automáticamente.',
+            'facturada': '¿Marcar como facturada? Asegúrese de haber registrado el número de factura.',
+            'pagada': '¿Marcar como pagada? Esta acción indica que la compra ha sido completamente pagada.'
+        };
+        
+        if (!confirm(mensajes[nuevoEstado] || '¿Cambiar el estado de esta compra?')) return;
         
         try {
             await api.patch(`/compras/${id}/estado`, { estado: nuevoEstado });
@@ -633,7 +863,7 @@ form.onsubmit = async (e) => {
     // ============================================
     
     async function cancelarCompra(id) {
-        if (!confirm('¿Está seguro de cancelar esta compra?\n\nNOTA: El inventario no se revertirá automáticamente.')) {
+        if (!confirm('¿Está seguro de cancelar esta compra?\n\nNOTA: Solo se pueden cancelar compras en estado borrador o pendiente.')) {
             return;
         }
         
@@ -654,6 +884,6 @@ form.onsubmit = async (e) => {
     await cargarDatosIniciales();
     await cargarCompras();
     
-    console.log('✅ Módulo de compras inicializado correctamente');
+    console.log('✅ Módulo de compras mejorado inicializado correctamente');
 })();
 </script>

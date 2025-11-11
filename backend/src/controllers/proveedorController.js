@@ -2,12 +2,14 @@ const ProveedorModel = require('../models/proveedorModel');
 
 const getAll = async (req, res) => {
   try {
-    const { estado, nombre, nit } = req.query;
+    const { estado, nombre, nit, categoria, calificacion_abc } = req.query;
     
     const filtros = {};
     if (estado !== undefined) filtros.estado = estado === 'true';
     if (nombre) filtros.nombre = nombre;
     if (nit) filtros.nit = nit;
+    if (categoria) filtros.categoria = categoria;
+    if (calificacion_abc) filtros.calificacion_abc = calificacion_abc;
 
     const proveedores = await ProveedorModel.getAll(filtros);
 
@@ -54,9 +56,13 @@ const getById = async (req, res) => {
 
 const create = async (req, res) => {
   try {
-    const { nombre, contacto, telefono, email, direccion, nit } = req.body;
+    const { 
+      nombre, razon_social, tipo_persona, contacto, telefono, email, 
+      direccion, nit, pais, dias_credito, limite_credito, categoria, 
+      forma_pago, calificacion_abc, notas_internas 
+    } = req.body;
 
-    // Validaciones
+    // Validaciones obligatorias
     if (!nombre || nombre.trim() === '') {
       return res.status(400).json({
         success: false,
@@ -68,6 +74,46 @@ const create = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'El NIT es requerido'
+      });
+    }
+
+    // Validar tipo de persona
+    if (tipo_persona && !['natural', 'juridica'].includes(tipo_persona)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Tipo de persona debe ser "natural" o "juridica"'
+      });
+    }
+
+    // Validar categoría
+    if (categoria && !['premium', 'regular', 'ocasional'].includes(categoria)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Categoría debe ser "premium", "regular" o "ocasional"'
+      });
+    }
+
+    // Validar calificación
+    if (calificacion_abc && !['A', 'B', 'C'].includes(calificacion_abc)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Calificación debe ser "A", "B" o "C"'
+      });
+    }
+
+    // Validar días de crédito
+    if (dias_credito && (dias_credito < 0 || isNaN(dias_credito))) {
+      return res.status(400).json({
+        success: false,
+        message: 'Días de crédito debe ser un número positivo'
+      });
+    }
+
+    // Validar límite de crédito
+    if (limite_credito && (limite_credito < 0 || isNaN(limite_credito))) {
+      return res.status(400).json({
+        success: false,
+        message: 'Límite de crédito debe ser un número positivo'
       });
     }
 
@@ -93,11 +139,20 @@ const create = async (req, res) => {
 
     const proveedorData = {
       nombre: nombre.trim(),
+      razon_social: razon_social?.trim(),
+      tipo_persona: tipo_persona || 'juridica',
       contacto: contacto?.trim(),
       telefono: telefono?.trim(),
       email: email?.trim(),
       direccion: direccion?.trim(),
-      nit: nit.trim()
+      nit: nit.trim(),
+      pais: pais?.trim() || 'Bolivia',
+      dias_credito: dias_credito || 0,
+      limite_credito: limite_credito || 0,
+      categoria: categoria || 'regular',
+      forma_pago: forma_pago?.trim() || 'contado',
+      calificacion_abc: calificacion_abc || null,
+      notas_internas: notas_internas?.trim()
     };
 
     const nuevoProveedor = await ProveedorModel.create(proveedorData);
@@ -120,7 +175,11 @@ const create = async (req, res) => {
 const update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nombre, contacto, telefono, email, direccion, nit, estado } = req.body;
+    const { 
+      nombre, razon_social, tipo_persona, contacto, telefono, email, 
+      direccion, nit, pais, dias_credito, limite_credito, categoria, 
+      forma_pago, calificacion_abc, notas_internas, estado 
+    } = req.body;
 
     // Verificar que el proveedor existe
     const proveedorExiste = await ProveedorModel.getById(id);
@@ -128,6 +187,28 @@ const update = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: 'Proveedor no encontrado'
+      });
+    }
+
+    // Validaciones
+    if (tipo_persona && !['natural', 'juridica'].includes(tipo_persona)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Tipo de persona debe ser "natural" o "juridica"'
+      });
+    }
+
+    if (categoria && !['premium', 'regular', 'ocasional'].includes(categoria)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Categoría debe ser "premium", "regular" o "ocasional"'
+      });
+    }
+
+    if (calificacion_abc && !['A', 'B', 'C'].includes(calificacion_abc)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Calificación debe ser "A", "B" o "C"'
       });
     }
 
@@ -155,11 +236,20 @@ const update = async (req, res) => {
 
     const proveedorData = {
       nombre: nombre?.trim(),
+      razon_social: razon_social?.trim(),
+      tipo_persona,
       contacto: contacto?.trim(),
       telefono: telefono?.trim(),
       email: email?.trim(),
       direccion: direccion?.trim(),
       nit: nit?.trim(),
+      pais: pais?.trim(),
+      dias_credito,
+      limite_credito,
+      categoria,
+      forma_pago: forma_pago?.trim(),
+      calificacion_abc,
+      notas_internas: notas_internas?.trim(),
       estado
     };
 

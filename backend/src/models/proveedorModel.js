@@ -7,11 +7,20 @@ const ProveedorModel = {
       SELECT 
         id_proveedor,
         nombre,
+        razon_social,
+        tipo_persona,
         contacto,
         telefono,
         email,
         direccion,
         nit,
+        pais,
+        dias_credito,
+        limite_credito,
+        categoria,
+        forma_pago,
+        calificacion_abc,
+        notas_internas,
         estado,
         fecha_creacion
       FROM proveedores
@@ -28,7 +37,7 @@ const ProveedorModel = {
     }
 
     if (filtros.nombre) {
-      query += ` AND nombre ILIKE $${paramIndex}`;
+      query += ` AND (nombre ILIKE $${paramIndex} OR razon_social ILIKE $${paramIndex})`;
       params.push(`%${filtros.nombre}%`);
       paramIndex++;
     }
@@ -36,6 +45,18 @@ const ProveedorModel = {
     if (filtros.nit) {
       query += ` AND nit = $${paramIndex}`;
       params.push(filtros.nit);
+      paramIndex++;
+    }
+
+    if (filtros.categoria) {
+      query += ` AND categoria = $${paramIndex}`;
+      params.push(filtros.categoria);
+      paramIndex++;
+    }
+
+    if (filtros.calificacion_abc) {
+      query += ` AND calificacion_abc = $${paramIndex}`;
+      params.push(filtros.calificacion_abc);
       paramIndex++;
     }
 
@@ -51,7 +72,8 @@ const ProveedorModel = {
       SELECT 
         p.*,
         COUNT(c.id_compra) as total_compras,
-        COALESCE(SUM(c.total), 0) as monto_total_compras
+        COALESCE(SUM(c.total), 0) as monto_total_compras,
+        MAX(c.fecha_compra) as ultima_compra
       FROM proveedores p
       LEFT JOIN compras c ON p.id_proveedor = c.id_proveedor
       WHERE p.id_proveedor = $1
@@ -77,22 +99,37 @@ const ProveedorModel = {
 
   // Crear proveedor
   create: async (proveedorData) => {
-    const { nombre, contacto, telefono, email, direccion, nit } = proveedorData;
+    const { 
+      nombre, razon_social, tipo_persona, contacto, telefono, email, 
+      direccion, nit, pais, dias_credito, limite_credito, categoria, 
+      forma_pago, calificacion_abc, notas_internas 
+    } = proveedorData;
 
     const query = `
       INSERT INTO proveedores (
-        nombre, contacto, telefono, email, direccion, nit
-      ) VALUES ($1, $2, $3, $4, $5, $6)
+        nombre, razon_social, tipo_persona, contacto, telefono, email, 
+        direccion, nit, pais, dias_credito, limite_credito, categoria, 
+        forma_pago, calificacion_abc, notas_internas
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
       RETURNING *
     `;
 
     const result = await pool.query(query, [
       nombre,
+      razon_social,
+      tipo_persona || 'juridica',
       contacto,
       telefono,
       email,
       direccion,
-      nit
+      nit,
+      pais || 'Bolivia',
+      dias_credito || 0,
+      limite_credito || 0,
+      categoria || 'regular',
+      forma_pago || 'contado',
+      calificacion_abc,
+      notas_internas
     ]);
 
     return result.rows[0];
@@ -100,30 +137,38 @@ const ProveedorModel = {
 
   // Actualizar proveedor
   update: async (id, proveedorData) => {
-    const { nombre, contacto, telefono, email, direccion, nit, estado } = proveedorData;
+    const { 
+      nombre, razon_social, tipo_persona, contacto, telefono, email, 
+      direccion, nit, pais, dias_credito, limite_credito, categoria, 
+      forma_pago, calificacion_abc, notas_internas, estado 
+    } = proveedorData;
 
     const query = `
       UPDATE proveedores SET
         nombre = COALESCE($1, nombre),
-        contacto = COALESCE($2, contacto),
-        telefono = COALESCE($3, telefono),
-        email = COALESCE($4, email),
-        direccion = COALESCE($5, direccion),
-        nit = COALESCE($6, nit),
-        estado = COALESCE($7, estado)
-      WHERE id_proveedor = $8
+        razon_social = COALESCE($2, razon_social),
+        tipo_persona = COALESCE($3, tipo_persona),
+        contacto = COALESCE($4, contacto),
+        telefono = COALESCE($5, telefono),
+        email = COALESCE($6, email),
+        direccion = COALESCE($7, direccion),
+        nit = COALESCE($8, nit),
+        pais = COALESCE($9, pais),
+        dias_credito = COALESCE($10, dias_credito),
+        limite_credito = COALESCE($11, limite_credito),
+        categoria = COALESCE($12, categoria),
+        forma_pago = COALESCE($13, forma_pago),
+        calificacion_abc = COALESCE($14, calificacion_abc),
+        notas_internas = COALESCE($15, notas_internas),
+        estado = COALESCE($16, estado)
+      WHERE id_proveedor = $17
       RETURNING *
     `;
 
     const result = await pool.query(query, [
-      nombre,
-      contacto,
-      telefono,
-      email,
-      direccion,
-      nit,
-      estado,
-      id
+      nombre, razon_social, tipo_persona, contacto, telefono, email,
+      direccion, nit, pais, dias_credito, limite_credito, categoria,
+      forma_pago, calificacion_abc, notas_internas, estado, id
     ]);
 
     return result.rows[0];

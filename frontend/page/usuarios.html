@@ -1,4 +1,4 @@
-<!-- usuarios.html - SIN <html>, <head>, solo contenido -->
+<!-- usuarios.html - VERSIÓN FINAL CON BOTÓN DETALLES Y SOLO CHECKBOXES -->
 <div class="usuarios-container" style="padding: 20px;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <h1><i class="fas fa-user-shield"></i> Gestión de Usuarios</h1>
@@ -21,15 +21,15 @@
 
     <!-- Tabla -->
     <div style="background: white; border-radius: 8px; overflow-x: auto; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-        <table id="tablaUsuarios" style="width: 100%; border-collapse: collapse; min-width: 800px;">
+        <table id="tablaUsuarios" style="width: 100%; border-collapse: collapse; min-width: 1000px;">
             <thead style="background: #f3f4f6;">
                 <tr>
                     <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">ID</th>
-                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Nombre</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Foto</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Nombre Completo</th>
                     <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Email</th>
-                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Roles</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Rol</th>
                     <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Estado</th>
-                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Último Acceso</th>
                     <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Acciones</th>
                 </tr>
             </thead>
@@ -38,8 +38,8 @@
     </div>
 
     <!-- Modal Usuario -->
-    <div id="modalUsuario" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;">
-        <div style="background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto;">
+    <div id="modalUsuario" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; overflow-y: auto;">
+        <div style="background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 700px; max-height: 90vh; overflow-y: auto; margin: 20px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h2 id="modalTitle">Nuevo Usuario</h2>
                 <button id="btnCerrarModal" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #666;">&times;</button>
@@ -47,83 +47,106 @@
             <form id="formUsuario">
                 <input type="hidden" name="id_usuario">
                 
-                <!-- Nombre -->
-                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Nombre Completo:</label>
-                <input type="text" name="nombre" required style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+                <!-- Foto de Perfil -->
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="width: 120px; height: 120px; border-radius: 50%; border: 3px solid #ddd; margin: 0 auto 10px; overflow: hidden; background: #f3f4f6; display: flex; align-items: center; justify-content: center;">
+                        <img id="previewFoto" src="" alt="Foto" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                        <i id="iconoFoto" class="fas fa-user" style="font-size: 50px; color: #9ca3af;"></i>
+                    </div>
+                    <input type="file" id="inputFoto" accept="image/*" style="display: none;">
+                    <button type="button" onclick="document.getElementById('inputFoto').click()" style="background: #6b7280; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">
+                        <i class="fas fa-camera"></i> Subir Foto
+                    </button>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Nombre:</label>
+                        <input type="text" name="nombre" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Apellido Paterno:</label>
+                        <input type="text" name="apellido_paterno" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Apellido Materno:</label>
+                        <input type="text" name="apellido_materno" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Cédula de Identidad:</label>
+                        <input type="text" name="cedula_identidad" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Fecha de Nacimiento:</label>
+                        <input type="date" name="fecha_nacimiento" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Número de Celular:</label>
+                        <input type="tel" name="celular" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+                    </div>
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: 600;">Email:</label>
+                    <input type="email" name="email" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+                </div>
                 
-                <!-- Email -->
-                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Email:</label>
-                <input type="email" name="email" required style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
-                
-                <!-- Contraseña -->
-                <div id="passwordFields">
+                <div id="passwordFields" style="margin-top: 15px;">
                     <label style="display: block; margin-bottom: 5px; font-weight: 600;">Contraseña:</label>
                     <div style="position: relative;">
-                        <input type="password" name="password" id="inputPassword" placeholder="Mínimo 8 caracteres" style="width: 100%; padding: 10px; padding-right: 40px; margin-bottom: 5px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+                        <input type="password" name="password" id="inputPassword" placeholder="Mínimo 8 caracteres" style="width: 100%; padding: 10px; padding-right: 40px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
                         <button type="button" id="togglePassword" style="position: absolute; right: 10px; top: 10px; background: none; border: none; cursor: pointer; font-size: 1.2em;">👁️</button>
                     </div>
-                    <small style="color: #666; display: block; margin-bottom: 15px;">Debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número</small>
+                    <small style="color: #666; display: block; margin-top: 5px;">Al menos 8 caracteres, una mayúscula, una minúscula y un número</small>
                 </div>
                 
-                <!-- Roles -->
-                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Roles:</label>
-                <div id="rolesCheckboxes" style="border: 1px solid #ddd; border-radius: 5px; padding: 10px; margin-bottom: 10px; max-height: 150px; overflow-y: auto; background: #f9fafb;">
-                    <!-- Se llenará dinámicamente -->
+                <div style="margin-top: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: 600;">Rol del Usuario:</label>
+                    <select id="selectRol" name="id_rol" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+                        <option value="">Seleccione un rol...</option>
+                    </select>
                 </div>
                 
-                <!-- Botón Permisos Individuales -->
-                <button type="button" id="btnGestionarPermisos" style="width: 100%; background: #8b5cf6; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-size: 14px; margin-bottom: 15px;">
-                    <i class="fas fa-key"></i> Gestionar Permisos Individuales
-                </button>
+                <!-- PERMISOS INDIVIDUALES - SOLO CHECKBOXES -->
+                <div style="margin-top: 20px; padding: 15px; background: #f0f9ff; border: 2px solid #8b5cf6; border-radius: 8px;">
+                    <h4 style="margin: 0 0 10px 0; color: #5b21b6;">🔑 Permisos Individuales</h4>
+                    <p style="margin: 0 0 15px 0; font-size: 13px; color: #475569;">Selecciona permisos adicionales para este usuario:</p>
+                    
+                    <input type="text" id="buscarPermiso" placeholder="🔍 Buscar..." style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 10px; box-sizing: border-box;">
+                    <div id="listaCheckboxes" style="max-height: 250px; overflow-y: auto; border: 1px solid #ddd; border-radius: 5px; padding: 10px; background: white;">
+                    </div>
+                    <div style="margin-top: 8px; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 12px; color: #666;">Seleccionados: <strong><span id="contadorPermisos">0</span></strong></span>
+                        <div>
+                            <button type="button" id="btnTodos" style="background: #3b82f6; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; margin-right: 5px;">✓ Todos</button>
+                            <button type="button" id="btnNinguno" style="background: #6b7280; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 11px;">✕ Ninguno</button>
+                        </div>
+                    </div>
+                </div>
                 
-                <!-- Estado -->
-                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Estado:</label>
-                <select name="estado" style="width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 5px;">
-                    <option value="true">Activo</option>
-                    <option value="false">Inactivo</option>
-                </select>
+                <div style="margin-top: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: 600;">Estado:</label>
+                    <select name="estado" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        <option value="true">Activo</option>
+                        <option value="false">Inactivo</option>
+                    </select>
+                </div>
                 
-                <!-- Botón Guardar -->
-                <button type="submit" style="width: 100%; background: #10b981; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: 600;">
+                <button type="submit" style="width: 100%; background: #10b981; color: white; border: none; padding: 14px; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: 600; margin-top: 20px;">
                     <i class="fas fa-save"></i> Guardar Usuario
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- Modal Permisos Individuales -->
-    <div id="modalPermisos" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1001;">
-        <div style="background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 700px; max-height: 85vh; overflow-y: auto;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px;">
-                <div>
-                    <h2 style="margin: 0;">🔑 Permisos Individuales</h2>
-                    <small style="color: #666;">Selecciona permisos adicionales aparte de los que vienen con los roles</small>
-                </div>
-                <button id="btnCerrarModalPermisos" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #666;">&times;</button>
+    <!-- Modal Detalles -->
+    <div id="modalDetalles" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1001; overflow-y: auto;">
+        <div style="background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; margin: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2><i class="fas fa-info-circle"></i> Detalles del Usuario</h2>
+                <button id="btnCerrarDetalles" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #666;">&times;</button>
             </div>
-            
-            <!-- Buscador de permisos -->
-            <div style="margin-bottom: 20px;">
-                <input type="text" id="buscarPermiso" placeholder="🔍 Buscar permiso..." style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
-            </div>
-
-            <!-- Contenedor de permisos por módulo -->
-            <div id="permisosContainer" style="max-height: 400px; overflow-y: auto;">
-                <!-- Se llenará dinámicamente -->
-            </div>
-
-            <div style="margin-top: 20px; display: flex; gap: 10px;">
-                <button id="btnSeleccionarTodos" style="flex: 1; background: #3b82f6; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer;">
-                    Seleccionar Todos
-                </button>
-                <button id="btnDeseleccionarTodos" style="flex: 1; background: #6b7280; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer;">
-                    Deseleccionar Todos
-                </button>
-            </div>
-
-            <button id="btnGuardarPermisos" style="width: 100%; background: #10b981; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: 600; margin-top: 15px;">
-                <i class="fas fa-check"></i> Aplicar Permisos
-            </button>
+            <div id="contenidoDetalles" style="line-height: 1.8;"></div>
         </div>
     </div>
 </div>
@@ -133,328 +156,214 @@
     console.log('🚀 Inicializando módulo de usuarios...');
     
     const api = window.api;
-    
     if (!api) {
-        console.error('❌ API no está disponible');
+        console.error('❌ API no disponible');
+        alert('❌ Error: API no está disponible');
         return;
     }
     
     const tabla = document.querySelector('#tablaUsuarios tbody');
     const modal = document.getElementById('modalUsuario');
-    const modalPermisos = document.getElementById('modalPermisos');
+    const modalDetalles = document.getElementById('modalDetalles');
     const form = document.getElementById('formUsuario');
     const btnNuevo = document.getElementById('btnNuevoUsuario');
     const btnCerrar = document.getElementById('btnCerrarModal');
-    const btnCerrarPermisos = document.getElementById('btnCerrarModalPermisos');
-    const btnGestionarPermisos = document.getElementById('btnGestionarPermisos');
-    const filtroEstado = document.getElementById('filtroEstado');
-    const buscarUsuario = document.getElementById('buscarUsuario');
-    const rolesCheckboxes = document.getElementById('rolesCheckboxes');
-    const permisosContainer = document.getElementById('permisosContainer');
-    const inputPassword = document.getElementById('inputPassword');
-    const passwordFields = document.getElementById('passwordFields');
+    const btnCerrarDetalles = document.getElementById('btnCerrarDetalles');
+    const inputFoto = document.getElementById('inputFoto');
+    const previewFoto = document.getElementById('previewFoto');
+    const iconoFoto = document.getElementById('iconoFoto');
 
     let rolesDisponibles = [];
     let permisosDisponibles = [];
-    let permisosSeleccionados = []; // Permisos individuales adicionales
+    let permisosSeleccionados = [];
+    let fotoBase64 = null;
 
-    // Toggle password
-    document.getElementById('togglePassword')?.addEventListener('click', function() {
-        const type = inputPassword.getAttribute('type') === 'password' ? 'text' : 'password';
-        inputPassword.setAttribute('type', type);
+    inputFoto.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                fotoBase64 = event.target.result;
+                previewFoto.src = fotoBase64;
+                previewFoto.style.display = 'block';
+                iconoFoto.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    document.getElementById('togglePassword').onclick = function() {
+        const input = document.getElementById('inputPassword');
+        const type = input.type === 'password' ? 'text' : 'password';
+        input.type = type;
         this.textContent = type === 'password' ? '👁️' : '🙈';
-    });
+    };
 
-    // Mostrar modal nuevo usuario
     btnNuevo.onclick = () => {
         form.reset();
         form.querySelector('[name="id_usuario"]').value = '';
         document.getElementById('modalTitle').textContent = 'Nuevo Usuario';
-        passwordFields.style.display = 'block';
-        inputPassword.required = true;
-        
-        const checkboxes = rolesCheckboxes.querySelectorAll('input[type="checkbox"]');
-        checkboxes.forEach(cb => cb.checked = false);
-        
+        document.getElementById('passwordFields').style.display = 'block';
+        document.getElementById('inputPassword').required = true;
+        previewFoto.style.display = 'none';
+        iconoFoto.style.display = 'block';
+        fotoBase64 = null;
+        document.getElementById('selectRol').value = '';
         permisosSeleccionados = [];
-        
+        renderizarPermisos();
         modal.style.display = 'flex';
     };
 
-    // Cerrar modales
     btnCerrar.onclick = () => modal.style.display = 'none';
-    btnCerrarPermisos.onclick = () => modalPermisos.style.display = 'none';
-    modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
-    modalPermisos.onclick = (e) => { if (e.target === modalPermisos) modalPermisos.style.display = 'none'; };
+    btnCerrarDetalles.onclick = () => modalDetalles.style.display = 'none';
 
-    // Abrir modal de permisos
-    btnGestionarPermisos.onclick = () => {
-        modalPermisos.style.display = 'flex';
-        renderizarPermisos();
-    };
-
-    // Cargar roles
     async function cargarRoles() {
         try {
             const response = await api.get('/roles');
-            console.log('📋 Respuesta roles:', response.data);
-            
             rolesDisponibles = response.data.data || response.data;
-            
-            if (!Array.isArray(rolesDisponibles)) {
-                console.error('❌ Roles no es un array');
-                rolesCheckboxes.innerHTML = '<p style="color: red;">Error al cargar roles</p>';
-                return;
-            }
-            
-            rolesCheckboxes.innerHTML = rolesDisponibles.map(rol => `
-                <label style="display: flex; align-items: center; gap: 8px; padding: 8px; cursor: pointer; border-radius: 4px; transition: background 0.2s;" 
-                       onmouseover="this.style.background='#e0e7ff'" 
-                       onmouseout="this.style.background='transparent'">
-                    <input type="checkbox" name="roles[]" value="${rol.id_rol}" style="cursor: pointer; width: 16px; height: 16px;">
-                    <div>
-                        <span style="font-size: 14px; font-weight: 600;">${rol.nombre}</span>
-                        ${rol.descripcion ? `<br><small style="color: #666;">${rol.descripcion}</small>` : ''}
-                    </div>
-                </label>
-            `).join('');
-            
-            console.log('✅ Roles cargados:', rolesDisponibles.length);
+            const selectRol = document.getElementById('selectRol');
+            selectRol.innerHTML = '<option value="">Seleccione un rol...</option>' + 
+                rolesDisponibles.map(rol => `<option value="${rol.id_rol}">${rol.nombre}</option>`).join('');
         } catch (error) {
             console.error('❌ Error cargando roles:', error);
-            rolesCheckboxes.innerHTML = '<p style="color: red;">Error al cargar roles. Verifica que el backend esté corriendo.</p>';
         }
     }
 
-    // Cargar permisos
     async function cargarPermisos() {
         try {
             const response = await api.get('/permisos');
-            console.log('🔑 Respuesta permisos:', response.data);
-            
             permisosDisponibles = response.data.data || response.data;
-            
-            if (!Array.isArray(permisosDisponibles)) {
-                console.error('❌ Permisos no es un array');
-                return;
-            }
-            
             console.log('✅ Permisos cargados:', permisosDisponibles.length);
         } catch (error) {
             console.error('❌ Error cargando permisos:', error);
+            permisosDisponibles = [];
         }
     }
 
-    // Renderizar permisos agrupados por módulo
     function renderizarPermisos() {
-        const permisosPorModulo = {};
-        
-        permisosDisponibles.forEach(p => {
-            const modulo = p.modulo || 'General';
-            if (!permisosPorModulo[modulo]) {
-                permisosPorModulo[modulo] = [];
-            }
-            permisosPorModulo[modulo].push(p);
+        const container = document.getElementById('listaCheckboxes');
+        container.innerHTML = permisosDisponibles.map(p => {
+            const checked = permisosSeleccionados.includes(p.id_permiso) ? 'checked' : '';
+            return `
+                <label class="permiso-checkbox" style="display: block; padding: 8px; margin-bottom: 5px; background: #f9fafb; border-radius: 4px; cursor: pointer; border: 1px solid #e5e7eb;">
+                    <input type="checkbox" value="${p.id_permiso}" ${checked} onchange="actualizarContador()" style="margin-right: 10px;">
+                    <span style="font-weight: 500; font-size: 13px;">${p.nombre}</span>
+                    ${p.descripcion ? `<span style="color: #666; font-size: 11px;"> - ${p.descripcion}</span>` : ''}
+                </label>
+            `;
+        }).join('');
+        actualizarContador();
+    }
+
+    window.actualizarContador = () => {
+        const checkboxes = document.querySelectorAll('#listaCheckboxes input[type="checkbox"]:checked');
+        document.getElementById('contadorPermisos').textContent = checkboxes.length;
+    };
+
+    document.getElementById('buscarPermiso').oninput = (e) => {
+        const busqueda = e.target.value.toLowerCase();
+        document.querySelectorAll('.permiso-checkbox').forEach(item => {
+            item.style.display = item.textContent.toLowerCase().includes(busqueda) ? 'block' : 'none';
         });
-
-        permisosContainer.innerHTML = Object.keys(permisosPorModulo).sort().map(modulo => `
-            <div style="margin-bottom: 20px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
-                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px; font-weight: 600; font-size: 15px;">
-                    📦 ${modulo}
-                </div>
-                <div style="padding: 10px; background: #f9fafb;">
-                    ${permisosPorModulo[modulo].map(p => `
-                        <label style="display: flex; align-items: start; gap: 10px; padding: 10px; cursor: pointer; border-radius: 4px; transition: all 0.2s; border-bottom: 1px solid #e5e7eb;"
-                               onmouseover="this.style.background='#e0e7ff'" 
-                               onmouseout="this.style.background='transparent'">
-                            <input type="checkbox" 
-                                   class="permiso-checkbox" 
-                                   value="${p.id_permiso}" 
-                                   ${permisosSeleccionados.includes(p.id_permiso) ? 'checked' : ''}
-                                   style="margin-top: 2px; cursor: pointer; width: 18px; height: 18px;">
-                            <div style="flex: 1;">
-                                <div style="font-weight: 600; color: #1f2937;">${p.nombre}</div>
-                                ${p.descripcion ? `<small style="color: #6b7280;">${p.descripcion}</small>` : ''}
-                            </div>
-                        </label>
-                    `).join('')}
-                </div>
-            </div>
-        `).join('');
-
-        // Buscador de permisos
-        document.getElementById('buscarPermiso').oninput = (e) => {
-            const busqueda = e.target.value.toLowerCase();
-            document.querySelectorAll('.permiso-checkbox').forEach(checkbox => {
-                const label = checkbox.closest('label');
-                const texto = label.textContent.toLowerCase();
-                label.style.display = texto.includes(busqueda) ? 'flex' : 'none';
-            });
-        };
-    }
-
-    // Seleccionar/Deseleccionar todos
-    document.getElementById('btnSeleccionarTodos').onclick = () => {
-        document.querySelectorAll('.permiso-checkbox').forEach(cb => cb.checked = true);
     };
 
-    document.getElementById('btnDeseleccionarTodos').onclick = () => {
-        document.querySelectorAll('.permiso-checkbox').forEach(cb => cb.checked = false);
+    document.getElementById('btnTodos').onclick = () => {
+        document.querySelectorAll('#listaCheckboxes input[type="checkbox"]').forEach(cb => {
+            if (cb.closest('.permiso-checkbox').style.display !== 'none') cb.checked = true;
+        });
+        actualizarContador();
     };
 
-    // Guardar permisos seleccionados
-    document.getElementById('btnGuardarPermisos').onclick = () => {
-        permisosSeleccionados = Array.from(document.querySelectorAll('.permiso-checkbox:checked'))
-            .map(cb => parseInt(cb.value));
-        
-        console.log('✅ Permisos individuales seleccionados:', permisosSeleccionados);
-        alert(`✅ ${permisosSeleccionados.length} permisos individuales seleccionados`);
-        modalPermisos.style.display = 'none';
+    document.getElementById('btnNinguno').onclick = () => {
+        document.querySelectorAll('#listaCheckboxes input[type="checkbox"]').forEach(cb => cb.checked = false);
+        actualizarContador();
     };
 
-    // Formatear fecha
-    function formatearFecha(fecha) {
-        if (!fecha) return 'Nunca';
-        const date = new Date(fecha);
-        const ahora = new Date();
-        const diff = ahora - date;
-        const minutos = Math.floor(diff / 60000);
-        const horas = Math.floor(diff / 3600000);
-        const dias = Math.floor(diff / 86400000);
-        
-        if (minutos < 1) return 'Hace un momento';
-        if (minutos < 60) return `Hace ${minutos} min`;
-        if (horas < 24) return `Hace ${horas} h`;
-        if (dias < 7) return `Hace ${dias} d`;
-        
-        return date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    }
-
-    // Cargar usuarios
     async function cargarUsuarios() {
         try {
-            console.log('👥 Cargando usuarios...');
-            
             const params = new URLSearchParams();
-            const buscar = buscarUsuario.value.trim();
-            const estado = filtroEstado.value;
-            
+            const buscar = document.getElementById('buscarUsuario').value.trim();
+            const estado = document.getElementById('filtroEstado').value;
             if (buscar) params.append('buscar', buscar);
             if (estado) params.append('estado', estado);
-            
-            const queryString = params.toString();
-            const url = queryString ? `/usuarios?${queryString}` : '/usuarios';
-            
+            const url = params.toString() ? `/usuarios?${params}` : '/usuarios';
             const response = await api.get(url);
-            console.log('👥 Respuesta usuarios:', response.data);
-            
             const usuarios = response.data.data || response.data;
-            
-            if (!Array.isArray(usuarios)) {
-                console.error('❌ Usuarios no es un array');
-                tabla.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px; color: red;">Error: Formato incorrecto</td></tr>';
+            if (!Array.isArray(usuarios) || usuarios.length === 0) {
+                tabla.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px; color: #666;">No hay usuarios registrados</td></tr>';
                 return;
             }
-            
-            console.log('✅ Usuarios cargados:', usuarios.length);
-            
-            if (usuarios.length === 0) {
-                tabla.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px; color: #666;">No se encontraron usuarios</td></tr>';
-                return;
-            }
-            
             tabla.innerHTML = usuarios.map(u => {
+                const nombreCompleto = `${u.nombre || ''} ${u.apellido_paterno || ''} ${u.apellido_materno || ''}`.trim() || 'N/A';
                 const roles = Array.isArray(u.roles) ? u.roles : [];
-                const rolesText = roles.length > 0 
-                    ? roles.map(r => `<span style="background: #dbeafe; color: #1e40af; padding: 2px 8px; border-radius: 12px; font-size: 12px; display: inline-block; margin: 2px;">${r.nombre}</span>`).join(' ')
-                    : '<span style="color: #999;">Sin roles</span>';
-                
+                const rolesHTML = roles.length > 0 ? roles.map(r => `<span style="background: #dbeafe; color: #1e40af; padding: 2px 8px; border-radius: 12px; font-size: 11px; display: inline-block; margin: 2px;">${r.nombre}</span>`).join(' ') : '<span style="color: #999; font-size: 12px;">Sin rol</span>';
                 return `
                     <tr>
                         <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${u.id_usuario}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${u.nombre || 'N/A'}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${u.email || 'N/A'}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${rolesText}</td>
                         <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
-                            ${u.bloqueado ? 
-                                '<span style="background: #dc2626; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">🔒 Bloqueado</span>' :
-                                u.estado ?
-                                '<span style="background: #10b981; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">✓ Activo</span>' :
-                                '<span style="background: #ef4444; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">✕ Inactivo</span>'
-                            }
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background: #e5e7eb; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                                ${u.foto_url ? `<img src="${u.foto_url}" style="width: 100%; height: 100%; object-fit: cover;">` : `<i class="fas fa-user" style="color: #9ca3af;"></i>`}
+                            </div>
                         </td>
-                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; font-size: 13px; color: #666;">${formatearFecha(u.ultimo_acceso)}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${nombreCompleto}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; font-size: 13px;">${u.email}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${rolesHTML}</td>
                         <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
-                            <button class="btn-edit" data-id="${u.id_usuario}" style="background: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; margin-right: 5px;">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn-delete" data-id="${u.id_usuario}" style="background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                            ${u.bloqueado ? '<span style="background: #dc2626; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px;">🔒 Bloqueado</span>' : u.estado ? '<span style="background: #10b981; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px;">✓ Activo</span>' : '<span style="background: #ef4444; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px;">✕ Inactivo</span>'}
+                        </td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
+                            <button class="btn-view" data-id="${u.id_usuario}" style="background: #8b5cf6; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; margin-right: 5px;"><i class="fas fa-eye"></i></button>
+                            <button class="btn-edit" data-id="${u.id_usuario}" style="background: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; margin-right: 5px;"><i class="fas fa-edit"></i></button>
+                            <button class="btn-delete" data-id="${u.id_usuario}" style="background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;"><i class="fas fa-trash"></i></button>
                         </td>
                     </tr>
                 `;
             }).join('');
-
-            tabla.querySelectorAll('.btn-edit').forEach(btn => {
-                btn.onclick = () => editarUsuario(btn.dataset.id);
-            });
-            tabla.querySelectorAll('.btn-delete').forEach(btn => {
-                btn.onclick = () => eliminarUsuario(btn.dataset.id);
-            });
-
+            tabla.querySelectorAll('.btn-view').forEach(btn => btn.onclick = () => verDetalles(btn.dataset.id));
+            tabla.querySelectorAll('.btn-edit').forEach(btn => btn.onclick = () => editarUsuario(btn.dataset.id));
+            tabla.querySelectorAll('.btn-delete').forEach(btn => btn.onclick = () => eliminarUsuario(btn.dataset.id));
         } catch (error) {
-            console.error('❌ Error:', error);
-            tabla.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 20px; color: red;">Error: ${error.response?.data?.message || error.message}</td></tr>`;
+            console.error('❌ Error cargando usuarios:', error);
+            tabla.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 20px; color: red;">Error: ${error.message}</td></tr>`;
         }
     }
 
-    // Filtros
     let timeoutBusqueda;
-    buscarUsuario.addEventListener('input', () => {
+    document.getElementById('buscarUsuario').oninput = () => {
         clearTimeout(timeoutBusqueda);
         timeoutBusqueda = setTimeout(cargarUsuarios, 500);
-    });
-    filtroEstado.addEventListener('change', cargarUsuarios);
+    };
+    document.getElementById('filtroEstado').onchange = cargarUsuarios;
 
-    // Guardar usuario
     form.onsubmit = async (e) => {
         e.preventDefault();
+        
+        permisosSeleccionados = Array.from(document.querySelectorAll('#listaCheckboxes input[type="checkbox"]:checked')).map(cb => parseInt(cb.value));
         
         const formData = new FormData(form);
         const data = {
             nombre: formData.get('nombre'),
+            apellido_paterno: formData.get('apellido_paterno'),
+            apellido_materno: formData.get('apellido_materno'),
+            cedula_identidad: formData.get('cedula_identidad'),
+            fecha_nacimiento: formData.get('fecha_nacimiento'),
+            celular: formData.get('celular'),
             email: formData.get('email'),
             estado: formData.get('estado') === 'true'
         };
-
+        if (fotoBase64) data.foto = fotoBase64;
         const password = formData.get('password');
         const idUsuario = formData.get('id_usuario');
-        
         if (password && password.trim() !== '') {
             data.password = password;
         } else if (!idUsuario) {
-            alert('❌ La contraseña es requerida');
+            alert('❌ La contraseña es requerida para usuarios nuevos');
             return;
         }
-
-        // Roles seleccionados
-        const rolesSeleccionados = [];
-        form.querySelectorAll('input[name="roles[]"]:checked').forEach(cb => {
-            rolesSeleccionados.push(parseInt(cb.value));
-        });
-        
-        if (rolesSeleccionados.length > 0) {
-            data.roles = rolesSeleccionados;
-        }
-
-        // Permisos individuales adicionales
-        if (permisosSeleccionados.length > 0) {
-            data.permisos = permisosSeleccionados;
-        }
-
+        const idRol = formData.get('id_rol');
+        if (idRol) data.id_rol = parseInt(idRol);
+        if (permisosSeleccionados.length > 0) data.permisos = permisosSeleccionados;
         console.log('💾 Guardando usuario:', data);
-
         try {
             if (idUsuario) {
                 await api.put(`/usuarios/${idUsuario}`, data);
@@ -463,75 +372,114 @@
                 await api.post('/usuarios', data);
                 alert('✅ Usuario creado correctamente');
             }
-            
             modal.style.display = 'none';
             cargarUsuarios();
-            
         } catch (error) {
             console.error('Error:', error);
-            const errorMsg = error.response?.data?.message || error.message;
-            const errorDetails = error.response?.data?.errors ? '\n' + error.response.data.errors.join('\n') : '';
-            alert('❌ Error: ' + errorMsg + errorDetails);
+            alert('❌ Error: ' + (error.response?.data?.message || error.message));
         }
     };
 
-    // Editar usuario
-    async function editarUsuario(id) {
+    async function verDetalles(id) {
         try {
             const response = await api.get(`/usuarios/${id}`);
             const u = response.data.data || response.data;
             
+            const nombreCompleto = `${u.nombre || ''} ${u.apellido_paterno || ''} ${u.apellido_materno || ''}`.trim();
+            const roles = Array.isArray(u.roles) ? u.roles : [];
+            const permisos = Array.isArray(u.permisos) ? u.permisos : [];
+            
+            let html = `
+                <div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <h3 style="margin: 0 0 10px 0; color: #1e293b;">👤 Información Personal</h3>
+                    <p style="margin: 5px 0;"><strong>ID:</strong> ${u.id_usuario}</p>
+                    <p style="margin: 5px 0;"><strong>Nombre Completo:</strong> ${nombreCompleto}</p>
+                    <p style="margin: 5px 0;"><strong>Email:</strong> ${u.email}</p>
+                    <p style="margin: 5px 0;"><strong>Cédula:</strong> ${u.cedula_identidad || 'No especificado'}</p>
+                    <p style="margin: 5px 0;"><strong>Fecha Nacimiento:</strong> ${u.fecha_nacimiento ? new Date(u.fecha_nacimiento).toLocaleDateString() : 'No especificado'}</p>
+                    <p style="margin: 5px 0;"><strong>Celular:</strong> ${u.celular || 'No especificado'}</p>
+                    <p style="margin: 5px 0;"><strong>Estado:</strong> ${u.estado ? '<span style="color: #10b981;">✓ Activo</span>' : '<span style="color: #ef4444;">✕ Inactivo</span>'}</p>
+                </div>
+
+                <div style="background: #eff6ff; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <h3 style="margin: 0 0 10px 0; color: #1e40af;">🎭 Rol Asignado</h3>
+                    ${roles.length > 0 ? roles.map(r => `<p style="margin: 5px 0;">• ${r.nombre}</p>`).join('') : '<p style="color: #666; font-style: italic;">Sin rol asignado</p>'}
+                </div>
+
+                <div style="background: #f0fdf4; padding: 15px; border-radius: 8px;">
+                    <h3 style="margin: 0 0 10px 0; color: #15803d;">🔑 Permisos (${permisos.length})</h3>
+                    ${permisos.length > 0 ? permisos.map(p => `<p style="margin: 5px 0; padding: 5px; background: white; border-radius: 4px;">• <strong>${p.nombre}</strong></p>`).join('') : '<p style="color: #666; font-style: italic;">Sin permisos asignados</p>'}
+                </div>
+            `;
+            
+            document.getElementById('contenidoDetalles').innerHTML = html;
+            modalDetalles.style.display = 'flex';
+        } catch (error) {
+            console.error('Error:', error);
+            alert('❌ Error al cargar detalles');
+        }
+    }
+
+    async function editarUsuario(id) {
+        try {
+            const response = await api.get(`/usuarios/${id}`);
+            const u = response.data.data || response.data;
             form.querySelector('[name="id_usuario"]').value = u.id_usuario;
-            form.querySelector('[name="nombre"]').value = u.nombre;
+            form.querySelector('[name="nombre"]').value = u.nombre || '';
+            form.querySelector('[name="apellido_paterno"]').value = u.apellido_paterno || '';
+            form.querySelector('[name="apellido_materno"]').value = u.apellido_materno || '';
+            form.querySelector('[name="cedula_identidad"]').value = u.cedula_identidad || '';
+            form.querySelector('[name="fecha_nacimiento"]').value = u.fecha_nacimiento ? u.fecha_nacimiento.split('T')[0] : '';
+            form.querySelector('[name="celular"]').value = u.celular || '';
             form.querySelector('[name="email"]').value = u.email;
             form.querySelector('[name="estado"]').value = u.estado.toString();
-            
-            passwordFields.style.display = 'block';
-            inputPassword.required = false;
-            inputPassword.value = '';
-            inputPassword.placeholder = 'Dejar en blanco para mantener actual';
-            
-            // Marcar roles
-            rolesCheckboxes.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
-            if (Array.isArray(u.roles)) {
-                u.roles.forEach(rol => {
-                    const checkbox = rolesCheckboxes.querySelector(`input[value="${rol.id_rol}"]`);
-                    if (checkbox) checkbox.checked = true;
-                });
+            if (u.foto_url) {
+                previewFoto.src = u.foto_url;
+                previewFoto.style.display = 'block';
+                iconoFoto.style.display = 'none';
+            } else {
+                previewFoto.style.display = 'none';
+                iconoFoto.style.display = 'block';
             }
-            
-            // Cargar permisos individuales del usuario
+            document.getElementById('passwordFields').style.display = 'block';
+            document.getElementById('inputPassword').required = false;
+            document.getElementById('inputPassword').value = '';
+            document.getElementById('inputPassword').placeholder = 'Dejar en blanco para mantener la actual';
+            const selectRol = document.getElementById('selectRol');
+            selectRol.value = '';
+            if (Array.isArray(u.roles) && u.roles.length > 0) {
+                selectRol.value = u.roles[0].id_rol;
+            }
             if (Array.isArray(u.permisos)) {
                 permisosSeleccionados = u.permisos.map(p => p.id_permiso);
+            } else {
+                permisosSeleccionados = [];
             }
-            
+            renderizarPermisos();
             document.getElementById('modalTitle').textContent = 'Editar Usuario';
             modal.style.display = 'flex';
-            
         } catch (error) {
             console.error('Error:', error);
             alert('❌ Error al cargar usuario');
         }
     }
 
-    // Eliminar usuario
     async function eliminarUsuario(id) {
-        if (!confirm('¿Desactivar este usuario?')) return;
-        
+        if (!confirm('¿Estás seguro de desactivar este usuario?')) return;
         try {
             await api.delete(`/usuarios/${id}`);
-            alert('✅ Usuario desactivado');
+            alert('✅ Usuario desactivado correctamente');
             cargarUsuarios();
         } catch (error) {
+            console.error('Error:', error);
             alert('❌ Error: ' + (error.response?.data?.message || error.message));
         }
     }
 
-    // Inicializar
     await cargarRoles();
     await cargarPermisos();
     await cargarUsuarios();
-    
-    console.log('✅ Módulo de usuarios inicializado');
+    renderizarPermisos();
+    console.log('✅ Módulo de usuarios inicializado correctamente');
 })();
 </script>

@@ -1,0 +1,352 @@
+<!-- ingredientes.html - Gestión de Ingredientes -->
+<div class="ingredientes-container" style="padding: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h1><i class="fas fa-seedling"></i> Gestión de Ingredientes</h1>
+        <button id="btnNuevoIngrediente" style="background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+            <i class="fas fa-plus"></i> Nuevo Ingrediente
+        </button>
+    </div>
+
+    <!-- Alertas de Stock Bajo -->
+    <div id="alertaStockBajo" style="display: none; background: #fef2f2; border: 2px solid #ef4444; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+        <h3 style="margin: 0 0 10px 0; color: #dc2626;"><i class="fas fa-exclamation-triangle"></i> ⚠️ Ingredientes con Stock Bajo</h3>
+        <div id="listaStockBajo"></div>
+    </div>
+
+    <!-- Filtros -->
+    <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+            <input type="text" id="buscarIngrediente" placeholder="🔍 Buscar por nombre o código..." style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+            <select id="filtroCategoria" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                <option value="">Todas las categorías</option>
+            </select>
+            <select id="filtroEstado" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                <option value="">Todos los estados</option>
+                <option value="true">Activo</option>
+                <option value="false">Inactivo</option>
+            </select>
+            <label style="display: flex; align-items: center; padding: 10px; background: #fef3c7; border-radius: 5px; cursor: pointer;">
+                <input type="checkbox" id="filtroStockBajo" style="margin-right: 8px;">
+                <span style="font-weight: 600;">⚠️ Solo stock bajo</span>
+            </label>
+        </div>
+    </div>
+
+    <!-- Tabla -->
+    <div style="background: white; border-radius: 8px; overflow-x: auto; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <table id="tablaIngredientes" style="width: 100%; border-collapse: collapse; min-width: 1200px;">
+            <thead style="background: #f3f4f6;">
+                <tr>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Código</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Nombre</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Categoría</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Unidad</th>
+                    <th style="padding: 12px; text-align: right; border-bottom: 2px solid #e5e7eb;">Costo Prom.</th>
+                    <th style="padding: 12px; text-align: right; border-bottom: 2px solid #e5e7eb;">Stock Actual</th>
+                    <th style="padding: 12px; text-align: right; border-bottom: 2px solid #e5e7eb;">Stock Mín.</th>
+                    <th style="padding: 12px; text-align: center; border-bottom: 2px solid #e5e7eb;">Estado</th>
+                    <th style="padding: 12px; text-align: center; border-bottom: 2px solid #e5e7eb;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <!-- Modal Ingrediente -->
+    <div id="modalIngrediente" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; overflow-y: auto;">
+        <div style="background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; margin: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 id="modalTitle">Nuevo Ingrediente</h2>
+                <button id="btnCerrarModal" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #666;">&times;</button>
+            </div>
+            <form id="formIngrediente">
+                <input type="hidden" name="id_ingrediente">
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Código: *</label>
+                        <input type="text" name="codigo" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Nombre: *</label>
+                        <input type="text" name="nombre" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+                    </div>
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: 600;">Descripción:</label>
+                    <textarea name="descripcion" rows="3" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; resize: vertical;"></textarea>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Categoría:</label>
+                        <select name="id_categoria" id="selectCategoria" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                            <option value="">Sin categoría</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Unidad de Medida: *</label>
+                        <select name="unidad_medida" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                            <option value="">Seleccione...</option>
+                            <option value="kg">Kilogramos (kg)</option>
+                            <option value="g">Gramos (g)</option>
+                            <option value="litros">Litros</option>
+                            <option value="ml">Mililitros (ml)</option>
+                            <option value="unidad">Unidades</option>
+                            <option value="paquete">Paquetes</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Costo Promedio:</label>
+                        <input type="number" name="costo_promedio" step="0.01" min="0" value="0" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+                        <small style="color: #666;">Bs. por unidad</small>
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Stock Mínimo:</label>
+                        <input type="number" name="stock_minimo" step="0.01" min="0" value="0" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+                        <small style="color: #666;">Alerta cuando baje de este valor</small>
+                    </div>
+                </div>
+
+                <div style="margin-top: 15px; padding: 15px; background: #f0f9ff; border-radius: 8px;">
+                    <p style="margin: 0 0 10px 0; font-weight: 600; color: #1e40af;">📦 Stock Actual: <span id="stockActualDisplay">0.00</span></p>
+                    <small style="color: #666;">El stock se actualiza automáticamente con Compras y Producción</small>
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: 600;">Estado:</label>
+                    <select name="estado" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        <option value="true">Activo</option>
+                        <option value="false">Inactivo</option>
+                    </select>
+                </div>
+
+                <button type="submit" style="width: 100%; background: #10b981; color: white; border: none; padding: 14px; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: 600; margin-top: 20px;">
+                    <i class="fas fa-save"></i> Guardar Ingrediente
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+(async function() {
+    console.log('🚀 Inicializando módulo de ingredientes...');
+    
+    const api = window.api;
+    if (!api) {
+        console.error('❌ API no disponible');
+        alert('❌ Error: API no está disponible');
+        return;
+    }
+    
+    const tabla = document.querySelector('#tablaIngredientes tbody');
+    const modal = document.getElementById('modalIngrediente');
+    const form = document.getElementById('formIngrediente');
+    const btnNuevo = document.getElementById('btnNuevoIngrediente');
+    const btnCerrar = document.getElementById('btnCerrarModal');
+
+    let categoriasDisponibles = [];
+
+    btnNuevo.onclick = () => {
+        form.reset();
+        form.querySelector('[name="id_ingrediente"]').value = '';
+        document.getElementById('modalTitle').textContent = 'Nuevo Ingrediente';
+        document.getElementById('stockActualDisplay').textContent = '0.00';
+        modal.style.display = 'flex';
+    };
+
+    btnCerrar.onclick = () => modal.style.display = 'none';
+
+    async function cargarCategorias() {
+        try {
+            const response = await api.get('/categorias');
+            categoriasDisponibles = response.data.data || response.data;
+            
+            const selectCategoria = document.getElementById('selectCategoria');
+            const filtroCategoria = document.getElementById('filtroCategoria');
+            
+            const options = categoriasDisponibles
+                .filter(c => c.nombre !== 'Ingredientes')
+                .map(c => `<option value="${c.id_categoria}">${c.nombre}</option>`)
+                .join('');
+            
+            selectCategoria.innerHTML = '<option value="">Sin categoría</option>' + options;
+            filtroCategoria.innerHTML = '<option value="">Todas las categorías</option>' + options;
+        } catch (error) {
+            console.error('❌ Error cargando categorías:', error);
+        }
+    }
+
+    async function verificarStockBajo() {
+        try {
+            const response = await api.get('/ingredientes/stock-bajo');
+            const stockBajo = response.data.data || [];
+            
+            const alerta = document.getElementById('alertaStockBajo');
+            const lista = document.getElementById('listaStockBajo');
+            
+            if (stockBajo.length > 0) {
+                alerta.style.display = 'block';
+                lista.innerHTML = stockBajo.map(i => 
+                    `<p style="margin: 5px 0;">• <strong>${i.nombre}</strong> - Stock: ${i.stock_actual} ${i.unidad_medida} (Mínimo: ${i.stock_minimo})</p>`
+                ).join('');
+            } else {
+                alerta.style.display = 'none';
+            }
+        } catch (error) {
+            console.error('❌ Error verificando stock bajo:', error);
+        }
+    }
+
+    async function cargarIngredientes() {
+        try {
+            const params = new URLSearchParams();
+            const buscar = document.getElementById('buscarIngrediente').value.trim();
+            const categoria = document.getElementById('filtroCategoria').value;
+            const estado = document.getElementById('filtroEstado').value;
+            const stockBajo = document.getElementById('filtroStockBajo').checked;
+
+            if (buscar) params.append('buscar', buscar);
+            if (categoria) params.append('categoria', categoria);
+            if (estado) params.append('estado', estado);
+            if (stockBajo) params.append('stock_bajo', 'true');
+
+            const url = params.toString() ? `/ingredientes?${params}` : '/ingredientes';
+            const response = await api.get(url);
+            const ingredientes = response.data.data || response.data;
+
+            if (!Array.isArray(ingredientes) || ingredientes.length === 0) {
+                tabla.innerHTML = '<tr><td colspan="9" style="text-align:center; padding: 20px; color: #666;">No hay ingredientes registrados</td></tr>';
+                return;
+            }
+
+            tabla.innerHTML = ingredientes.map(i => {
+                const stockBajoClass = i.stock_bajo ? 'background: #fee2e2; color: #991b1b;' : '';
+                const stockIcon = i.stock_bajo ? '⚠️ ' : '';
+                
+                return `
+                    <tr style="${stockBajoClass}">
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; font-family: monospace; font-weight: 600;">${i.codigo}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; font-weight: 500;">${i.nombre}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; font-size: 13px;">${i.categoria_nombre || 'Sin categoría'}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${i.unidad_medida}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: right;">Bs. ${parseFloat(i.costo_promedio).toFixed(2)}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: right; font-weight: 600;">${stockIcon}${parseFloat(i.stock_actual).toFixed(2)} ${i.unidad_medida}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: right; color: #666;">${parseFloat(i.stock_minimo).toFixed(2)} ${i.unidad_medida}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center;">
+                            ${i.estado ? '<span style="background: #10b981; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px;">✓ Activo</span>' : '<span style="background: #ef4444; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px;">✕ Inactivo</span>'}
+                        </td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center;">
+                            <button class="btn-edit" data-id="${i.id_ingrediente}" style="background: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; margin-right: 5px;"><i class="fas fa-edit"></i></button>
+                            <button class="btn-delete" data-id="${i.id_ingrediente}" style="background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            tabla.querySelectorAll('.btn-edit').forEach(btn => btn.onclick = () => editarIngrediente(btn.dataset.id));
+            tabla.querySelectorAll('.btn-delete').forEach(btn => btn.onclick = () => eliminarIngrediente(btn.dataset.id));
+        } catch (error) {
+            console.error('❌ Error cargando ingredientes:', error);
+            tabla.innerHTML = `<tr><td colspan="9" style="text-align:center; padding: 20px; color: red;">Error: ${error.message}</td></tr>`;
+        }
+    }
+
+    let timeoutBusqueda;
+    document.getElementById('buscarIngrediente').oninput = () => {
+        clearTimeout(timeoutBusqueda);
+        timeoutBusqueda = setTimeout(cargarIngredientes, 500);
+    };
+    document.getElementById('filtroCategoria').onchange = cargarIngredientes;
+    document.getElementById('filtroEstado').onchange = cargarIngredientes;
+    document.getElementById('filtroStockBajo').onchange = cargarIngredientes;
+
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+        
+        const formData = new FormData(form);
+        const data = {
+            codigo: formData.get('codigo'),
+            nombre: formData.get('nombre'),
+            descripcion: formData.get('descripcion'),
+            id_categoria: formData.get('id_categoria') || null,
+            unidad_medida: formData.get('unidad_medida'),
+            costo_promedio: parseFloat(formData.get('costo_promedio')) || 0,
+            stock_minimo: parseFloat(formData.get('stock_minimo')) || 0,
+            estado: formData.get('estado') === 'true'
+        };
+
+        const idIngrediente = formData.get('id_ingrediente');
+
+        console.log('💾 Guardando ingrediente:', data);
+
+        try {
+            if (idIngrediente) {
+                await api.put(`/ingredientes/${idIngrediente}`, data);
+                alert('✅ Ingrediente actualizado correctamente');
+            } else {
+                await api.post('/ingredientes', data);
+                alert('✅ Ingrediente creado correctamente');
+            }
+            modal.style.display = 'none';
+            cargarIngredientes();
+            verificarStockBajo();
+        } catch (error) {
+            console.error('Error:', error);
+            alert('❌ Error: ' + (error.response?.data?.message || error.message));
+        }
+    };
+
+    async function editarIngrediente(id) {
+        try {
+            const response = await api.get(`/ingredientes/${id}`);
+            const i = response.data.data || response.data;
+
+            form.querySelector('[name="id_ingrediente"]').value = i.id_ingrediente;
+            form.querySelector('[name="codigo"]').value = i.codigo;
+            form.querySelector('[name="nombre"]').value = i.nombre;
+            form.querySelector('[name="descripcion"]').value = i.descripcion || '';
+            form.querySelector('[name="id_categoria"]').value = i.id_categoria || '';
+            form.querySelector('[name="unidad_medida"]').value = i.unidad_medida;
+            form.querySelector('[name="costo_promedio"]').value = i.costo_promedio;
+            form.querySelector('[name="stock_minimo"]').value = i.stock_minimo;
+            form.querySelector('[name="estado"]').value = i.estado.toString();
+            
+            document.getElementById('stockActualDisplay').textContent = `${parseFloat(i.stock_actual).toFixed(2)} ${i.unidad_medida}`;
+            document.getElementById('modalTitle').textContent = 'Editar Ingrediente';
+            modal.style.display = 'flex';
+        } catch (error) {
+            console.error('Error:', error);
+            alert('❌ Error al cargar ingrediente');
+        }
+    }
+
+    async function eliminarIngrediente(id) {
+        if (!confirm('¿Estás seguro de eliminar este ingrediente?\n\nNOTA: Solo se puede eliminar si no está siendo usado en recetas o compras.')) return;
+        
+        try {
+            await api.delete(`/ingredientes/${id}`);
+            alert('✅ Ingrediente eliminado correctamente');
+            cargarIngredientes();
+            verificarStockBajo();
+        } catch (error) {
+            console.error('Error:', error);
+            alert('❌ Error: ' + (error.response?.data?.message || error.message));
+        }
+    }
+
+    await cargarCategorias();
+    await cargarIngredientes();
+    await verificarStockBajo();
+    
+    // Verificar stock bajo cada 5 minutos
+    setInterval(verificarStockBajo, 300000);
+    
+    console.log('✅ Módulo de ingredientes inicializado correctamente');
+})();
+</script>

@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
         location.reload();
     });
 
-    // Cargar módulo por defecto (home)
+    // Cargar módulo por defecto (productos)
     loadModule('productos');
 });
 
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // ============================================
 
 function initDashboard() {
-    console.log('Dashboard inicializado');
+    console.log('✅ Dashboard inicializado');
 }
 
 // ============================================
@@ -118,9 +118,11 @@ async function loadModule(moduleName) {
     const mainContent = document.getElementById('dash-content');
     
     if (!mainContent) {
-        console.error('Elemento dash-content no encontrado');
+        console.error('❌ Elemento dash-content no encontrado');
         return;
     }
+    
+    console.log(`📦 Cargando módulo: ${moduleName}`);
     
     // Mostrar loading
     mainContent.innerHTML = `
@@ -133,24 +135,11 @@ async function loadModule(moduleName) {
     `;
     
     try {
-        // ✅ CORREGIDO: Ruta correcta /page/ en lugar de modulo/
+        // Cargar HTML del módulo
         const response = await fetch(`/page/${moduleName}.html`);
         
         if (!response.ok) {
-            mainContent.innerHTML = `
-                <div class="content-section active">
-                    <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 1.5rem; margin: 2rem;">
-                        <div style="display: flex; align-items: center; gap: 1rem;">
-                            <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #ff9800;"></i>
-                            <div>
-                                <h3 style="margin: 0 0 0.5rem 0; color: #856404;">Módulo no encontrado</h3>
-                                <p style="margin: 0; color: #856404;">El módulo "${moduleName}" no está disponible o en desarrollo.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            return;
+            throw new Error(`Módulo no encontrado: ${moduleName}`);
         }
         
         const html = await response.text();
@@ -160,7 +149,7 @@ async function loadModule(moduleName) {
         // Cargar solo el body
         mainContent.innerHTML = doc.body.innerHTML;
         
-        // Re-ejecutar scripts
+        // Re-ejecutar scripts del módulo
         const scripts = mainContent.querySelectorAll('script');
         scripts.forEach(oldScript => {
             const newScript = document.createElement('script');
@@ -172,9 +161,10 @@ async function loadModule(moduleName) {
             
             if (oldScript.src) {
                 newScript.src = oldScript.src;
+                console.log(`📜 Cargando script externo: ${oldScript.src}`);
+            } else {
+                newScript.textContent = oldScript.textContent;
             }
-            
-            newScript.textContent = oldScript.textContent;
             
             // Copiar atributos
             Array.from(oldScript.attributes).forEach(attr => {
@@ -189,7 +179,7 @@ async function loadModule(moduleName) {
         console.log(`✅ Módulo ${moduleName} cargado correctamente`);
         
     } catch (error) {
-        console.error('Error al cargar módulo:', error);
+        console.error('❌ Error al cargar módulo:', error);
         mainContent.innerHTML = `
             <div class="content-section active">
                 <div style="background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 8px; padding: 1.5rem; margin: 2rem;">
@@ -197,7 +187,7 @@ async function loadModule(moduleName) {
                         <i class="fas fa-times-circle" style="font-size: 2rem; color: #dc3545;"></i>
                         <div>
                             <h3 style="margin: 0 0 0.5rem 0; color: #721c24;">Error al cargar módulo</h3>
-                            <p style="margin: 0; color: #721c24;">No se pudo cargar el módulo. Por favor, intente nuevamente.</p>
+                            <p style="margin: 0; color: #721c24;">No se pudo cargar el módulo "${moduleName}". Por favor, intente nuevamente.</p>
                             <small style="color: #721c24; opacity: 0.8;">${error.message}</small>
                         </div>
                     </div>
@@ -214,3 +204,8 @@ async function loadModule(moduleName) {
 function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
+// Hacer loadModule global para que pedido.js pueda usarla
+window.loadModule = loadModule;
+
+console.log('✅ dashboard.js cargado correctamente');

@@ -1,0 +1,137 @@
+<!-- Leaflet CSS para el mapa -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+
+<div class="pedido-container">
+  <div class="pedido-header">
+    <h1><i class="fas fa-shopping-bag"></i> Registrar Nuevo Pedido</h1>
+    <p class="pedido-numero" id="numeroPedido">Generando número de pedido...</p>
+  </div>
+
+  <div class="ubicacion-section">
+    <h2><i class="fas fa-map-marker-alt"></i> Ubicación de Entrega</h2>
+    <div id="mapaPedido"></div>
+    <div class="ubicacion-info">
+      <div class="ubicacion-texto">
+        <strong id="ubicacionNombre">Mi ubicación</strong>
+        <span id="ubicacionDireccion">Cargando...</span>
+      </div>
+      <button class="btn btn-primary" onclick="cambiarUbicacion()">
+        <i class="fas fa-edit"></i> Cambiar Ubicación
+      </button>
+    </div>
+  </div>
+
+  <div class="productos-section">
+    <h2><i class="fas fa-box"></i> Productos del Pedido</h2>
+    <div class="productos-actions">
+      <button class="btn btn-primary" onclick="abrirModalProductos()">
+        <i class="fas fa-plus"></i> Agregar Producto
+      </button>
+      <button class="btn btn-secondary" onclick="agregarDesdeCarrito()">
+        <i class="fas fa-shopping-cart"></i> Agregar desde Carrito
+      </button>
+    </div>
+    <div class="productos-tabla" id="tablaProductos">
+      <div class="empty-state">
+        <i class="fas fa-shopping-basket"></i>
+        <p>No hay productos agregados</p>
+        <p style="font-size: 0.9em;">Usa los botones de arriba para agregar productos</p>
+      </div>
+    </div>
+    <div class="pedido-total" id="pedidoTotal" style="display: none;">
+      <span style="font-size: 1.2em; font-weight: 600;">Total:</span>
+      <strong id="totalMonto">Bs 0.00</strong>
+    </div>
+  </div>
+
+  <div class="pedido-footer">
+    <button class="btn btn-secondary" onclick="cancelarPedido()">
+      <i class="fas fa-times"></i> Cancelar
+    </button>
+    <button class="btn btn-success" onclick="realizarPedido()" id="btnRealizarPedido" disabled>
+      <i class="fas fa-check"></i> Realizar Pedido
+    </button>
+  </div>
+</div>
+
+<!-- Modales -->
+<div class="modal" id="modalAgregarProducto">
+  <div class="modal-content">
+    <span class="modal-close" onclick="cerrarModalProductos()">&times;</span>
+    <h3><i class="fas fa-search"></i> Seleccionar Producto</h3>
+    <div style="margin-bottom: 1rem;">
+      <input type="text" id="buscarProducto" class="form-control" placeholder="Buscar producto..." onkeyup="buscarProductoModal()" />
+    </div>
+    <div class="modal-productos" id="listaProductosModal">
+      <div class="loading-content">
+        <div class="spinner"></div>
+        <p>Cargando productos...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modalCantidad">
+  <div class="modal-content">
+    <span class="modal-close" onclick="cerrarModalCantidad()">&times;</span>
+    <h3><i class="fas fa-calculator"></i> Cantidad</h3>
+    <div id="productoSeleccionadoInfo" style="margin-bottom: 1.5rem; padding: 1rem; background: var(--bg-secondary); border-radius: 8px;"></div>
+    <div class="form-group">
+      <label>Cantidad:</label>
+      <input type="number" id="inputCantidad" class="form-control" min="1" value="1" style="text-align: center; font-size: 1.5em;" />
+    </div>
+    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+      <button class="btn btn-secondary" onclick="cerrarModalCantidad()" style="flex: 1;">Cancelar</button>
+      <button class="btn btn-primary" onclick="confirmarAgregarProducto()" style="flex: 1;">
+        <i class="fas fa-check"></i> Agregar
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modalQR">
+  <div class="modal-content qr-modal-content">
+    <h3><i class="fas fa-qrcode"></i> ¡Pedido Creado Exitosamente!</h3>
+    <p style="margin: 1rem 0;">Número de pedido: <strong id="qrNumeroPedido"></strong></p>
+    <div class="qr-image" id="qrImageContainer">
+      <img id="qrImage" src="" alt="QR de Pago" />
+    </div>
+    <div class="qr-instrucciones">
+      <strong><i class="fas fa-info-circle"></i> Instrucciones de pago:</strong>
+      <ol>
+        <li>Escanea el código QR con tu aplicación bancaria</li>
+        <li>Verifica que el monto sea correcto</li>
+        <li>Confirma el pago en tu banco</li>
+        <li>Recibirás una confirmación cuando se procese</li>
+      </ol>
+    </div>
+    <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+      <button class="btn btn-secondary" onclick="descargarQR()" style="flex: 1;">
+        <i class="fas fa-download"></i> Descargar QR
+      </button>
+      <button class="btn btn-primary" onclick="cerrarModalQR()" style="flex: 1;">
+        <i class="fas fa-check"></i> Entendido
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay" style="display: none;">
+  <div class="loading-content">
+    <div class="spinner"></div>
+    <p>Procesando pedido...</p>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+// Cargar LibelulaService dinámicamente si no existe
+if (typeof LibelulaService === 'undefined') {
+  const script = document.createElement('script');
+  script.src = '../js/libelulaService.js';
+  script.onload = () => console.log('✅ LibelulaService cargado');
+  script.onerror = () => console.error('❌ Error cargando LibelulaService');
+  document.head.appendChild(script);
+}
+</script>
+<script src="../js/pedido.js"></script>

@@ -11,6 +11,9 @@
     <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
             <input type="text" id="buscarAlmacen" placeholder="Buscar almacén..." style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+            <select id="filtroTipo" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                <option value="">Todos los tipos</option>
+            </select>
             <select id="filtroEstado" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
                 <option value="">Todos los estados</option>
                 <option value="true">Activo</option>
@@ -20,15 +23,17 @@
     </div>
 
     <!-- Tabla -->
-    <div style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-        <table id="tablaAlmacenes" style="width: 100%; border-collapse: collapse;">
+    <div style="background: white; border-radius: 8px; overflow-x: auto; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <table id="tablaAlmacenes" style="width: 100%; border-collapse: collapse; min-width: 1000px;">
             <thead style="background: #f3f4f6;">
                 <tr>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Código</th>
                     <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Nombre</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Tipo</th>
                     <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Ubicación</th>
-                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Capacidad Máxima</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Capacidad</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Ocupación</th>
                     <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Estado</th>
-                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Productos</th>
                     <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Acciones</th>
                 </tr>
             </thead>
@@ -38,7 +43,7 @@
 
     <!-- Modal Crear/Editar -->
     <div id="modalAlmacen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;">
-        <div style="background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto;">
+        <div style="background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 700px; max-height: 90vh; overflow-y: auto;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h2 id="modalTitle"><i class="fas fa-warehouse"></i> Nuevo Almacén</h2>
                 <button id="btnCerrarModal" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #666;">&times;</button>
@@ -47,21 +52,49 @@
             <form id="formAlmacen">
                 <input type="hidden" name="id_almacen">
                 
-                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Nombre del Almacén:</label>
-                <input type="text" name="nombre" required style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
-                
-                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Ubicación:</label>
-                <input type="text" name="ubicacion" placeholder="Ej: Planta Baja, Sector A" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
-                
-                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Capacidad Máxima (m³):</label>
-                <input type="number" name="capacidad_maxima" step="0.01" min="0" placeholder="Opcional" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
-                <small style="color: #666; display: block; margin-top: -10px; margin-bottom: 15px;">Deja en blanco si no aplica</small>
-                
-                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Estado:</label>
-                <select name="estado" style="width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 5px;">
-                    <option value="true">Activo</option>
-                    <option value="false">Inactivo</option>
-                </select>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <!-- Columna 1 -->
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Nombre del Almacén: *</label>
+                        <input type="text" name="nombre" required style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+                        
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Tipo de Almacén: *</label>
+                        <select name="tipo_almacen" id="selectTipoAlmacen" required style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px;">
+                            <option value="">Seleccionar tipo...</option>
+                        </select>
+                        
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Ubicación:</label>
+                        <input type="text" name="ubicacion" placeholder="Ej: Planta Baja, Sector A" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+                        
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Capacidad Máxima:</label>
+                        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                            <input type="number" name="capacidad_maxima" step="0.01" min="0" placeholder="Ej: 1000" style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                            <select name="unidad_medida" style="width: 80px; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                                <option value="m³">m³</option>
+                                <option value="m²">m²</option>
+                                <option value="kg">kg</option>
+                                <option value="ton">ton</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Columna 2 -->
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Temperatura:</label>
+                        <select name="temperatura" id="selectTemperatura" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px;">
+                            <option value="Ambiente">Ambiente (15-25°C)</option>
+                        </select>
+                        
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Estado:</label>
+                        <select name="estado" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px;">
+                            <option value="true">Activo</option>
+                            <option value="false">Inactivo</option>
+                        </select>
+                        
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Notas:</label>
+                        <textarea name="notas" rows="4" placeholder="Información adicional..." style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; resize: vertical;"></textarea>
+                    </div>
+                </div>
                 
                 <button type="submit" style="width: 100%; background: #10b981; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: 600;">
                     <i class="fas fa-save"></i> Guardar Almacén
@@ -70,70 +103,95 @@
         </div>
     </div>
 
-    <!-- Modal Ver Productos -->
-    <div id="modalProductos" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;">
-        <div style="background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto;">
+    <!-- Modal Ver Inventario -->
+    <div id="modalInventario" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;">
+        <div style="background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 900px; max-height: 90vh; overflow-y: auto;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2><i class="fas fa-boxes"></i> Productos en Almacén</h2>
-                <button id="btnCerrarProductos" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #666;">&times;</button>
+                <h2><i class="fas fa-boxes"></i> Inventario del Almacén</h2>
+                <button id="btnCerrarInventario" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #666;">&times;</button>
             </div>
             
-            <div id="nombreAlmacenProductos" style="background: #f3f4f6; padding: 10px; border-radius: 5px; margin-bottom: 20px; font-weight: 600;"></div>
+            <div id="infoAlmacenInventario" style="background: #f3f4f6; padding: 15px; border-radius: 5px; margin-bottom: 20px;"></div>
             
-            <div id="contenidoProductos">
-                <!-- Se llenará dinámicamente -->
+            <div id="contenidoInventario"></div>
+        </div>
+    </div>
+
+    <!-- Modal Historial -->
+    <div id="modalHistorial" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;">
+        <div style="background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 900px; max-height: 90vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2><i class="fas fa-history"></i> Historial de Movimientos</h2>
+                <button id="btnCerrarHistorial" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #666;">&times;</button>
             </div>
+            
+            <div id="contenidoHistorial"></div>
         </div>
     </div>
 </div>
 
 <script>
 (async function() {
-    console.log('🚀 Inicializando módulo de almacenes...');
+    console.log('🚀 Inicializando módulo de almacenes mejorado...');
     
     const api = window.api;
     
     if (!api) {
-        console.error('❌ API no está disponible. Asegúrate de cargar api.js antes.');
+        console.error('❌ API no está disponible');
         return;
     }
     
     const tabla = document.querySelector('#tablaAlmacenes tbody');
     const modal = document.getElementById('modalAlmacen');
-    const modalProductos = document.getElementById('modalProductos');
+    const modalInventario = document.getElementById('modalInventario');
+    const modalHistorial = document.getElementById('modalHistorial');
     const form = document.getElementById('formAlmacen');
     const btnNuevo = document.getElementById('btnNuevoAlmacen');
-    const btnCerrar = document.getElementById('btnCerrarModal');
-    const btnCerrarProductos = document.getElementById('btnCerrarProductos');
+    const filtroTipo = document.getElementById('filtroTipo');
     const filtroEstado = document.getElementById('filtroEstado');
     const buscarAlmacen = document.getElementById('buscarAlmacen');
 
-    if (!tabla || !modal || !form) {
-        console.error('❌ Elementos del DOM no encontrados');
-        return;
+    // Cerrar modales
+    document.getElementById('btnCerrarModal').onclick = () => modal.style.display = 'none';
+    document.getElementById('btnCerrarInventario').onclick = () => modalInventario.style.display = 'none';
+    document.getElementById('btnCerrarHistorial').onclick = () => modalHistorial.style.display = 'none';
+    
+    [modal, modalInventario, modalHistorial].forEach(m => {
+        m.onclick = (e) => { if (e.target === m) m.style.display = 'none'; };
+    });
+
+    // ============================================
+    // CARGAR CATÁLOGOS
+    // ============================================
+    
+    async function cargarCatalogos() {
+        try {
+            // Cargar tipos de almacén
+            const tiposResp = await api.get('/almacenes/catalogos/tipos');
+            const tipos = tiposResp.data.data || tiposResp.data;
+            
+            const selectTipo = document.getElementById('selectTipoAlmacen');
+            selectTipo.innerHTML = '<option value="">Seleccionar tipo...</option>' + 
+                tipos.map(t => `<option value="${t.nombre}">${t.nombre}</option>`).join('');
+            
+            // Para filtro
+            filtroTipo.innerHTML = '<option value="">Todos los tipos</option>' + 
+                tipos.map(t => `<option value="${t.nombre}">${t.nombre}</option>`).join('');
+            
+            // Cargar temperaturas
+            const tempResp = await api.get('/almacenes/catalogos/temperaturas');
+            const temperaturas = tempResp.data.data || tempResp.data;
+            
+            const selectTemp = document.getElementById('selectTemperatura');
+            selectTemp.innerHTML = temperaturas.map(t => 
+                `<option value="${t.nombre}">${t.nombre} (${t.temp_minima}°C a ${t.temp_maxima}°C)</option>`
+            ).join('');
+            
+            console.log('✅ Catálogos cargados');
+        } catch (error) {
+            console.error('Error al cargar catálogos:', error);
+        }
     }
-
-    // ============================================
-    // ABRIR/CERRAR MODALES
-    // ============================================
-    
-    btnNuevo.onclick = () => {
-        form.reset();
-        form.querySelector('[name="id_almacen"]').value = '';
-        document.getElementById('modalTitle').innerHTML = '<i class="fas fa-warehouse"></i> Nuevo Almacén';
-        modal.style.display = 'flex';
-    };
-
-    btnCerrar.onclick = () => modal.style.display = 'none';
-    btnCerrarProductos.onclick = () => modalProductos.style.display = 'none';
-    
-    modal.onclick = (e) => {
-        if (e.target === modal) modal.style.display = 'none';
-    };
-
-    modalProductos.onclick = (e) => {
-        if (e.target === modalProductos) modalProductos.style.display = 'none';
-    };
 
     // ============================================
     // CARGAR ALMACENES
@@ -141,117 +199,163 @@
     
     async function cargarAlmacenes() {
         try {
-            console.log('📦 Cargando almacenes...');
-            
             const params = new URLSearchParams();
-            
-            const buscar = buscarAlmacen.value.trim();
             const estado = filtroEstado.value;
+            const tipo = filtroTipo.value;
             
             if (estado) params.append('estado', estado);
+            if (tipo) params.append('tipo_almacen', tipo);
             
             const queryString = params.toString();
             const url = queryString ? `/almacenes?${queryString}` : '/almacenes';
             
-            console.log('🔍 URL de búsqueda:', url);
-            
             const response = await api.get(url);
-            console.log('📦 Respuesta almacenes:', response.data);
-            
             let almacenes = response.data.data || response.data;
             
             if (!Array.isArray(almacenes)) {
-                console.error('❌ Almacenes no es un array:', almacenes);
-                tabla.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px; color: red;">Error: Formato de datos incorrecto</td></tr>';
+                console.error('❌ Formato incorrecto:', almacenes);
+                tabla.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 20px; color: red;">Error en datos</td></tr>';
                 return;
             }
 
-            // Filtrar por búsqueda local
+            // Filtro local por búsqueda
+            const buscar = buscarAlmacen.value.trim().toLowerCase();
             if (buscar) {
                 almacenes = almacenes.filter(a => 
-                    a.nombre.toLowerCase().includes(buscar.toLowerCase()) ||
-                    (a.ubicacion && a.ubicacion.toLowerCase().includes(buscar.toLowerCase()))
+                    (a.codigo && a.codigo.toLowerCase().includes(buscar)) ||
+                    (a.nombre && a.nombre.toLowerCase().includes(buscar)) ||
+                    (a.ubicacion && a.ubicacion.toLowerCase().includes(buscar))
                 );
             }
             
-            console.log('✅ Almacenes cargados:', almacenes.length);
-            
             if (almacenes.length === 0) {
-                tabla.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px; color: #666;">No se encontraron almacenes</td></tr>';
+                tabla.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 20px; color: #666;">No se encontraron almacenes</td></tr>';
                 return;
             }
             
-            tabla.innerHTML = almacenes.map(a => `
-                <tr>
-                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
-                        <strong>${a.nombre || 'N/A'}</strong>
-                    </td>
-                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${a.ubicacion || 'No especificada'}</td>
-                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
-                        ${a.capacidad_maxima ? parseFloat(a.capacidad_maxima).toFixed(2) + ' m³' : 'No definida'}
-                    </td>
-                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
-                        <span style="background: ${a.estado ? '#10b981' : '#ef4444'}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
-                            ${a.estado ? 'Activo' : 'Inactivo'}
-                        </span>
-                    </td>
-                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
-                        <button class="btn-ver-productos" data-id="${a.id_almacen}" data-nombre="${a.nombre}" style="background: #6366f1; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
-                            <i class="fas fa-boxes"></i> Ver
-                        </button>
-                    </td>
-                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
-                        <button class="btn-edit" data-id="${a.id_almacen}" style="background: #3b82f6; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 5px;">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn-delete" data-id="${a.id_almacen}" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
+            tabla.innerHTML = almacenes.map(a => {
+                const porcentaje = parseFloat(a.porcentaje_ocupacion || 0);
+                let colorBarra = '#10b981';
+                if (porcentaje > 80) colorBarra = '#ef4444';
+                else if (porcentaje > 60) colorBarra = '#f59e0b';
+                
+                return `
+                    <tr>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
+                            <strong style="color: #3b82f6;">${a.codigo || 'N/A'}</strong>
+                        </td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
+                            <strong>${a.nombre || 'N/A'}</strong><br>
+                            <small style="color: #666;">${a.temperatura || 'Ambiente'}</small>
+                        </td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
+                            <span style="background: #e0e7ff; color: #3730a3; padding: 4px 8px; border-radius: 4px; font-size: 11px;">
+                                ${a.tipo_almacen || 'Mixto'}
+                            </span>
+                        </td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${a.ubicacion || 'No especificada'}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
+                            ${a.capacidad_maxima ? parseFloat(a.capacidad_maxima).toFixed(2) + ' ' + (a.unidad_medida || 'm³') : 'No definida'}
+                        </td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div style="flex: 1; background: #e5e7eb; height: 20px; border-radius: 10px; overflow: hidden;">
+                                    <div style="width: ${porcentaje}%; height: 100%; background: ${colorBarra}; transition: width 0.3s;"></div>
+                                </div>
+                                <span style="font-size: 12px; font-weight: 600; min-width: 40px;">${porcentaje.toFixed(0)}%</span>
+                            </div>
+                        </td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
+                            <span style="background: ${a.estado ? '#10b981' : '#ef4444'}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
+                                ${a.estado ? 'Activo' : 'Inactivo'}
+                            </span>
+                        </td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
+                            <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                                <button class="btn-ver-inventario" data-id="${a.id_almacen}" title="Ver inventario" style="background: #6366f1; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer;">
+                                    <i class="fas fa-boxes"></i>
+                                </button>
+                                <button class="btn-ver-historial" data-id="${a.id_almacen}" title="Ver historial" style="background: #8b5cf6; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer;">
+                                    <i class="fas fa-history"></i>
+                                </button>
+                                <button class="btn-edit" data-id="${a.id_almacen}" title="Editar" style="background: #3b82f6; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer;">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-bloquear" data-id="${a.id_almacen}" data-estado="${a.estado}" title="${a.estado ? 'Bloquear' : 'Activar'}" style="background: ${a.estado ? '#f59e0b' : '#10b981'}; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer;">
+                                    <i class="fas fa-${a.estado ? 'lock' : 'unlock'}"></i>
+                                </button>
+                                <button class="btn-delete" data-id="${a.id_almacen}" title="Eliminar" style="background: #ef4444; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
 
-            // Event delegation
-            tabla.querySelectorAll('.btn-ver-productos').forEach(btn => {
-                btn.onclick = () => verProductos(btn.dataset.id, btn.dataset.nombre);
+            // Event listeners
+            tabla.querySelectorAll('.btn-ver-inventario').forEach(btn => {
+                btn.onclick = () => verInventario(btn.dataset.id);
+            });
+            tabla.querySelectorAll('.btn-ver-historial').forEach(btn => {
+                btn.onclick = () => verHistorial(btn.dataset.id);
             });
             tabla.querySelectorAll('.btn-edit').forEach(btn => {
                 btn.onclick = () => editarAlmacen(btn.dataset.id);
+            });
+            tabla.querySelectorAll('.btn-bloquear').forEach(btn => {
+                btn.onclick = () => bloquearAlmacen(btn.dataset.id, btn.dataset.estado === 'true');
             });
             tabla.querySelectorAll('.btn-delete').forEach(btn => {
                 btn.onclick = () => eliminarAlmacen(btn.dataset.id);
             });
 
         } catch (error) {
-            console.error('❌ Error al cargar almacenes:', error);
-            tabla.innerHTML = `
-                <tr>
-                    <td colspan="6" style="text-align:center; padding: 20px; color: red;">
-                        Error al cargar almacenes: ${error.response?.data?.message || error.message}
-                    </td>
-                </tr>
-            `;
+            console.error('❌ Error:', error);
+            tabla.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 20px; color: red;">Error: ${error.message}</td></tr>`;
         }
     }
 
     // ============================================
-    // VER PRODUCTOS DEL ALMACÉN
+    // VER INVENTARIO
     // ============================================
     
-    async function verProductos(id, nombre) {
+    async function verInventario(id) {
         try {
-            document.getElementById('nombreAlmacenProductos').textContent = `Almacén: ${nombre}`;
+            const [almacenResp, inventarioResp] = await Promise.all([
+                api.get(`/almacenes/${id}`),
+                api.get(`/almacenes/${id}/inventario`)
+            ]);
             
-            const response = await api.get(`/almacenes/${id}/productos`);
-            const productos = response.data.data || response.data;
+            const almacen = almacenResp.data.data || almacenResp.data;
+            const inventario = inventarioResp.data.data || inventarioResp.data;
             
-            const contenido = document.getElementById('contenidoProductos');
+            const porcentaje = parseFloat(almacen.porcentaje_ocupacion || 0);
             
-            if (!productos || productos.length === 0) {
+            document.getElementById('infoAlmacenInventario').innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div>
+                        <strong>Almacén:</strong> ${almacen.nombre}<br>
+                        <strong>Código:</strong> ${almacen.codigo}
+                    </div>
+                    <div>
+                        <strong>Tipo:</strong> ${almacen.tipo_almacen}<br>
+                        <strong>Ubicación:</strong> ${almacen.ubicacion || 'N/A'}
+                    </div>
+                    <div>
+                        <strong>Capacidad:</strong> ${almacen.capacidad_maxima || 'N/A'} ${almacen.unidad_medida || 'm³'}<br>
+                        <strong>Ocupación:</strong> ${porcentaje.toFixed(1)}%
+                    </div>
+                </div>
+            `;
+            
+            const contenido = document.getElementById('contenidoInventario');
+            
+            if (!inventario || inventario.length === 0) {
                 contenido.innerHTML = `
                     <div style="text-align: center; padding: 40px; color: #999;">
                         <i class="fas fa-box-open" style="font-size: 3rem; margin-bottom: 10px;"></i>
-                        <p>No hay productos asignados a este almacén</p>
+                        <p>No hay productos en este almacén</p>
                     </div>
                 `;
             } else {
@@ -262,65 +366,118 @@
                                 <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Código</th>
                                 <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Producto</th>
                                 <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Cantidad</th>
-                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Stock Min</th>
-                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Stock Max</th>
-                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Estado</th>
+                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Volumen</th>
+                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Última Act.</th>
                             </tr>
                         </thead>
                         <tbody>
-                            ${productos.map(p => {
-                                const cantidad = parseFloat(p.cantidad);
-                                const stockMin = parseFloat(p.stock_minimo);
-                                const stockMax = p.stock_maximo ? parseFloat(p.stock_maximo) : null;
-                                
-                                let estadoStock = '';
-                                let colorEstado = '';
-                                
-                                if (cantidad <= 0) {
-                                    estadoStock = 'Sin stock';
-                                    colorEstado = '#ef4444';
-                                } else if (cantidad < stockMin) {
-                                    estadoStock = 'Stock bajo';
-                                    colorEstado = '#f59e0b';
-                                } else if (stockMax && cantidad > stockMax) {
-                                    estadoStock = 'Exceso';
-                                    colorEstado = '#6366f1';
-                                } else {
-                                    estadoStock = 'Normal';
-                                    colorEstado = '#10b981';
-                                }
-                                
-                                return `
-                                    <tr>
-                                        <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">${p.codigo}</td>
-                                        <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">${p.producto_nombre}</td>
-                                        <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;"><strong>${cantidad.toFixed(2)}</strong></td>
-                                        <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">${stockMin.toFixed(2)}</td>
-                                        <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">${stockMax ? stockMax.toFixed(2) : 'N/A'}</td>
-                                        <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">
-                                            <span style="background: ${colorEstado}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px;">
-                                                ${estadoStock}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                `;
-                            }).join('')}
+                            ${inventario.map(p => `
+                                <tr>
+                                    <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">${p.producto_codigo}</td>
+                                    <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">${p.producto_nombre}</td>
+                                    <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;"><strong>${parseFloat(p.cantidad).toFixed(2)}</strong></td>
+                                    <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">${parseFloat(p.volumen_ocupado || 0).toFixed(2)} ${almacen.unidad_medida || 'm³'}</td>
+                                    <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">${new Date(p.fecha_ultima_actualizacion).toLocaleString()}</td>
+                                </tr>
+                            `).join('')}
                         </tbody>
                     </table>
                 `;
             }
             
-            modalProductos.style.display = 'flex';
+            modalInventario.style.display = 'flex';
         } catch (error) {
             console.error('Error:', error);
-            alert('❌ Error al cargar productos del almacén');
+            alert('❌ Error al cargar inventario');
         }
     }
 
     // ============================================
-    // GUARDAR ALMACÉN
+    // VER HISTORIAL
     // ============================================
     
+    async function verHistorial(id) {
+        try {
+            const response = await api.get(`/almacenes/${id}/historial`);
+            const historial = response.data.data || response.data;
+            
+            const contenido = document.getElementById('contenidoHistorial');
+            
+            if (!historial || historial.length === 0) {
+                contenido.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #999;">
+                        <i class="fas fa-history" style="font-size: 3rem; margin-bottom: 10px;"></i>
+                        <p>No hay movimientos registrados</p>
+                    </div>
+                `;
+            } else {
+                contenido.innerHTML = `
+                    <div style="max-height: 500px; overflow-y: auto;">
+                        ${historial.map(h => {
+                            let iconoTipo = 'exchange-alt';
+                            let colorTipo = '#6366f1';
+                            
+                            if (h.tipo_movimiento === 'entrada') { iconoTipo = 'arrow-down'; colorTipo = '#10b981'; }
+                            else if (h.tipo_movimiento === 'salida') { iconoTipo = 'arrow-up'; colorTipo = '#ef4444'; }
+                            else if (h.tipo_movimiento === 'bloqueo') { iconoTipo = 'lock'; colorTipo = '#f59e0b'; }
+                            else if (h.tipo_movimiento === 'ajuste') { iconoTipo = 'edit'; colorTipo = '#8b5cf6'; }
+                            
+                            return `
+                                <div style="border-left: 3px solid ${colorTipo}; padding: 15px; margin-bottom: 15px; background: #f9fafb; border-radius: 5px;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                        <strong style="color: ${colorTipo};">
+                                            <i class="fas fa-${iconoTipo}"></i> ${h.tipo_movimiento.toUpperCase()}
+                                        </strong>
+                                        <span style="color: #666; font-size: 13px;">${new Date(h.fecha_movimiento).toLocaleString()}</span>
+                                    </div>
+                                    <div style="color: #374151; margin-bottom: 8px;">${h.descripcion || 'Sin descripción'}</div>
+                                    <div style="font-size: 13px; color: #666;">
+                                        Ocupación: ${h.ocupacion_anterior?.toFixed(2) || '0.00'} → ${h.ocupacion_nueva?.toFixed(2) || '0.00'}
+                                        (${h.porcentaje_anterior?.toFixed(1) || '0.0'}% → ${h.porcentaje_nuevo?.toFixed(1) || '0.0'}%)
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+            }
+            
+            modalHistorial.style.display = 'flex';
+        } catch (error) {
+            console.error('Error:', error);
+            alert('❌ Error al cargar historial');
+        }
+    }
+
+    // ============================================
+    // BLOQUEAR/DESBLOQUEAR
+    // ============================================
+    
+    async function bloquearAlmacen(id, estadoActual) {
+        const accion = estadoActual ? 'bloquear' : 'activar';
+        if (!confirm(`¿Deseas ${accion} este almacén?`)) return;
+        
+        try {
+            await api.post(`/almacenes/${id}/bloquear`, { bloquear: estadoActual });
+            alert(`✅ Almacén ${accion === 'bloquear' ? 'bloqueado' : 'activado'} correctamente`);
+            cargarAlmacenes();
+        } catch (error) {
+            console.error('Error:', error);
+            alert('❌ Error al cambiar estado del almacén');
+        }
+    }
+
+    // ============================================
+    // CREAR/EDITAR ALMACÉN
+    // ============================================
+    
+    btnNuevo.onclick = () => {
+        form.reset();
+        form.querySelector('[name="id_almacen"]').value = '';
+        document.getElementById('modalTitle').innerHTML = '<i class="fas fa-warehouse"></i> Nuevo Almacén';
+        modal.style.display = 'flex';
+    };
+
     form.onsubmit = async (e) => {
         e.preventDefault();
         
@@ -335,9 +492,12 @@
             delete data.capacidad_maxima;
         }
         
-        if (!data.ubicacion) {
-            delete data.ubicacion;
-        }
+        // Limpiar campos vacíos opcionales
+        ['ubicacion', 'notas'].forEach(campo => {
+            if (!data[campo] || data[campo].trim() === '') {
+                delete data[campo];
+            }
+        });
 
         try {
             const idAlmacen = data.id_almacen;
@@ -356,14 +516,10 @@
             
         } catch (error) {
             console.error('Error al guardar:', error);
-            alert('❌ Error al guardar almacén: ' + (error.response?.data?.message || error.message));
+            alert('❌ Error: ' + (error.response?.data?.message || error.message));
         }
     };
 
-    // ============================================
-    // EDITAR ALMACÉN
-    // ============================================
-    
     async function editarAlmacen(id) {
         try {
             const response = await api.get(`/almacenes/${id}`);
@@ -373,14 +529,18 @@
             form.querySelector('[name="nombre"]').value = a.nombre;
             form.querySelector('[name="ubicacion"]').value = a.ubicacion || '';
             form.querySelector('[name="capacidad_maxima"]').value = a.capacidad_maxima || '';
+            form.querySelector('[name="tipo_almacen"]').value = a.tipo_almacen || 'Mixto';
+            form.querySelector('[name="temperatura"]').value = a.temperatura || 'Ambiente';
+            form.querySelector('[name="unidad_medida"]').value = a.unidad_medida || 'm³';
             form.querySelector('[name="estado"]').value = a.estado.toString();
+            form.querySelector('[name="notas"]').value = a.notas || '';
             
             document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit"></i> Editar Almacén';
             modal.style.display = 'flex';
             
         } catch (error) {
             console.error('Error:', error);
-            alert('❌ Error al cargar almacén para editar');
+            alert('❌ Error al cargar almacén');
         }
     }
 
@@ -397,12 +557,12 @@
             cargarAlmacenes();
         } catch (error) {
             console.error('Error:', error);
-            alert('❌ Error al eliminar almacén: ' + (error.response?.data?.message || error.message));
+            alert('❌ Error: ' + (error.response?.data?.message || error.message));
         }
     }
 
     // ============================================
-    // EVENTOS DE FILTROS
+    // FILTROS
     // ============================================
     
     let timeoutBusqueda;
@@ -410,13 +570,15 @@
     buscarAlmacen.addEventListener('input', () => {
         clearTimeout(timeoutBusqueda);
         timeoutBusqueda = setTimeout(() => {
-            console.log('🔍 Buscando:', buscarAlmacen.value);
             cargarAlmacenes();
         }, 500);
     });
 
     filtroEstado.addEventListener('change', () => {
-        console.log('🔘 Filtro estado:', filtroEstado.value);
+        cargarAlmacenes();
+    });
+
+    filtroTipo.addEventListener('change', () => {
         cargarAlmacenes();
     });
 
@@ -424,8 +586,9 @@
     // INICIALIZAR
     // ============================================
     
+    await cargarCatalogos();
     await cargarAlmacenes();
     
-    console.log('✅ Módulo de almacenes inicializado correctamente');
+    console.log('✅ Módulo de almacenes mejorado inicializado');
 })();
 </script>
